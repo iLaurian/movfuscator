@@ -1,3 +1,8 @@
+# 2025-12-26
+
+- add dummy data in `.data` section @done
+- add macros in header
+
 # 2025-12-22
 
 For the sake of simplicity we are going to use this `todo.md` file for planning and notes, rather than GitHub issues or projects.
