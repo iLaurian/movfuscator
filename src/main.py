@@ -10,13 +10,14 @@ if __name__ == '__main__':
         print(f"Error: File '{input_filename}' not found.")
         sys.exit(1)
 
-    new_content = process_data_section(content)
+    step1_lines = process_data_section(content)
+
+    final_content = add_macros(step1_lines)
 
     try:
         with open(output_filename, 'w') as f:
-            f.writelines(new_content)
+            f.writelines(final_content)
         print(f"Successfully processed '{input_filename}' -> '{output_filename}'")
     except IOError as e:
         print(f"Error writing to file '{output_filename}': {e}")
-
 

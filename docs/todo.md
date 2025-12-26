@@ -1,7 +1,10 @@
 # 2025-12-26
 
-- add dummy data in `.data` section @done
-- add macros in header
+- inject dummy data in `.data` section @done
+- inject macros in header @done
+- instructions interpreter
+  - should interpret opcodes we want to replace, leave everything else the same
+  - must be able to handle all types of data accessing methods
 
 # 2025-12-22
 
@@ -102,9 +105,8 @@ Key Ideas:
       o:      .long o_0, o_1 
       o_0:    .long 0, 4
       o_1:    .long 4, 4
-      
-      .text
-      .macro OR_MACRO result, src1, src2
+
+      .macro logical_or result, src1, src2
           movl    \src1, %eax
           movl    o(%eax), %edx
           movl    \src2, %eax
@@ -119,7 +121,6 @@ Key Ideas:
       a_0: .long 0, 0
       a_1: .long 0, 4
       
-      .text
       .macro logic_and arg1, arg2, arg3
         movl \arg2, %eax
         movl a(%eax), %edx
@@ -132,7 +133,7 @@ Key Ideas:
       ```
       .data
       n: .long 4, 0
-      .text
+      
       .macro logic_not dest, src
         movl    \src, %eax
         movl    n(%eax), %eax
