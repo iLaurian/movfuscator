@@ -1,4 +1,5 @@
 from utils.parser import *
+import pprint
 
 if __name__ == '__main__':
     input_filename, output_filename = parse_args()
@@ -9,6 +10,9 @@ if __name__ == '__main__':
     except FileNotFoundError:
         print(f"Error: File '{input_filename}' not found.")
         sys.exit(1)
+
+    assembly_code = parse_asm_source(content)
+    # pprint.pp(assembly_code)
 
     step1_lines = process_data_section(content)
 

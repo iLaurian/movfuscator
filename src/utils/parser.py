@@ -117,3 +117,108 @@ def add_macros(lines):
         final_lines.extend([d + "\n" for d in all_data_content])
 
     return final_lines
+
+def parse_operand(operand):
+    """
+    Identifies the addressing mode and value of a single operand.
+    Returns a tuple: (addressing_mode, value)
+    """
+    operand = operand.strip()
+
+    if operand.startswith('$'):
+        return 'imm', operand[1:]
+    elif operand.startswith('%'):
+        return 'reg', operand
+    elif '(' in operand and ')' in operand:
+        return 'mem', operand
+    elif operand.startswith('.'):
+        return 'section_name', operand
+    elif re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', operand):
+        return 'label', operand
+    else:
+        return 'mem', operand
+
+def parse_asm_source(lines):
+    """
+    Parses ASM source file and returns a list of processed lines.
+    :param lines: list of lines to process representing the source assembly file.
+    :return: a list of processed lines with the following format: [(assembler_directive, args), (label, [dtype, value]), ..., (opcode, [(addressing_mode, value)...])].
+    """
+    parsed_output = []
+    current_section = None
+
+    data_pattern = re.compile(r'^\s*([a-zA-Z_][a-zA-Z0-9_]*):\s*(\.[a-z]+)\s+(.*)')
+    label_pattern = re.compile(r'^\s*([a-zA-Z_][a-zA-Z0-9_]*):\s*$')
+
+    for line in lines:
+        clean_line = line.split('#')[0].strip()
+
+        if not clean_line:
+            continue
+
+        if clean_line.startswith('.'):
+            parts = clean_line.split(maxsplit=1)
+            directive = parts[0]
+
+            if directive == '.data':
+                current_section = 'data'
+            elif directive == '.text':
+                current_section = 'text'
+
+            # assembler directives
+            parsed_args = []
+            if len(parts) > 1:
+                arg_str = parts[1]
+                args = [a.strip() for a in arg_str.split(',')]
+                for arg in args:
+                    parsed_args.append(parse_operand(arg))
+
+            parsed_output.append((directive, parsed_args))
+            continue
+
+        if current_section == 'data':
+            match = data_pattern.match(clean_line)
+            if match:
+                label = match.group(1)
+                dtype = match.group(2)
+                values = [v.strip() for v in match.group(3).split(',')]
+
+                parsed_output.append((label, [dtype, values]))
+                continue
+
+        label_match = label_pattern.match(clean_line)
+        if label_match:
+            label_name = label_match.group(1)
+            parsed_output.append((label_name + ":", []))
+            continue
+
+        parts = clean_line.split(maxsplit=1)
+        opcode = parts[0]
+        parsed_operands = []
+
+        if len(parts) > 1:
+            raw_operands = parts[1]
+
+            operand_strings = []
+            current_op = []
+            paren_depth = 0
+
+            for char in raw_operands:
+                if char == '(':
+                    paren_depth += 1
+                elif char == ')':
+                    paren_depth -= 1
+
+                if char == ',' and paren_depth == 0:
+                    operand_strings.append("".join(current_op))
+                    current_op = []
+                else:
+                    current_op.append(char)
+            operand_strings.append("".join(current_op))
+
+            for op_str in operand_strings:
+                parsed_operands.append(parse_operand(op_str))
+
+        parsed_output.append((opcode, parsed_operands))
+
+    return parsed_output

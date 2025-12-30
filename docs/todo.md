@@ -1,3 +1,7 @@
+# 2025-12-30
+
+- assembly code parser @done
+
 # 2025-12-26
 
 - inject dummy data in `.data` section @done
