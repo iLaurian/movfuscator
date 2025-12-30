@@ -2,6 +2,41 @@
 
 - assembly code parser @done
 
+# 2025-12-28
+
+```
+ALTELE:
+int
+lea
+mov
+loop
+
+JUMP-URI:
+jmp
+jump-uri conditionale (jge, jle, je, jz, jnz)
+call
+
+STACK:
+push
+pop
+
+ALU:
+add + sub
+cmp
+and + or + xor
+test
+inc + dec
+div
+mul
+shr + shl
+
+.data:
+ZFLAG: .byte
+DUMMY_ZFLAG: .byte
+CFLAG: .byte
+CFLAG_ZFLAG: .byte
+```
+
 # 2025-12-26
 
 - inject dummy data in `.data` section @done
