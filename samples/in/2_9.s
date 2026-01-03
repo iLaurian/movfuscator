@@ -12,7 +12,7 @@ et_loop:
     incl %ecx
     cmpl %ebx, %ecx
     jle et_next
-    movl %ecx, %ebx    ; Update max
+    movl %ecx, %ebx
 
 et_next:
     shrl $1, %eax

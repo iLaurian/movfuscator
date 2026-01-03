@@ -8,7 +8,6 @@ main:
     cmp %ebx, %eax
     jge greater_or_equal
 
-    ; Case EAX < EBX
     movl $1, %ecx
     jmp end
 

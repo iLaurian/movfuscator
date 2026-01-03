@@ -1,6 +1,5 @@
 import sys
 import re
-from . import macros
 
 def parse_args():
     """
@@ -77,46 +76,6 @@ def process_data_section(lines):
         processed_lines.append(line)
 
     return processed_lines
-
-
-def add_macros(lines):
-    macro_generators = [
-        macros.get_increment_def,
-        macros.get_decrement_def,
-        macros.get_logical_or_def,
-        macros.get_logical_and_def,
-        macros.get_logical_not_def
-    ]
-
-    all_data_content = []
-    all_macro_content = []
-
-    for gen in macro_generators:
-        data_part, macro_part = gen()
-        if data_part:
-            all_data_content.append(data_part)
-        if macro_part:
-            all_macro_content.append(macro_part)
-
-    final_lines = []
-
-    if all_macro_content:
-        final_lines.extend([m + "\n" for m in all_macro_content])
-
-    data_injected = False
-
-    for line in lines:
-        final_lines.append(line)
-        # Inject Data Tables immediately after .data directive
-        if not data_injected and line.strip().startswith('.data'):
-            final_lines.extend([d + "\n" for d in all_data_content])
-            data_injected = True
-
-    if not data_injected and all_data_content:
-        final_lines.append("\n.data\n")
-        final_lines.extend([d + "\n" for d in all_data_content])
-
-    return final_lines
 
 def parse_operand(operand):
     """

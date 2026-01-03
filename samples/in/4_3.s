@@ -20,7 +20,6 @@ et_parcurgere:
     cmp %ebx, %edx
     jle verifica_max2
 
-    ; Found new max1
     movl %ebx, max2
     movl %edx, max1
     jmp et_cont_parcurgere
@@ -33,7 +32,6 @@ verifica_max2:
     cmp %esi, %edx
     jge et_cont_parcurgere
 
-    ; Found new max2
     movl %edx, max2
 
 et_cont_parcurgere:

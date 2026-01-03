@@ -1,3 +1,13 @@
+# 2026-01-03
+
+- implement alu with moves and flags
+  - logical and, or, xor, not @done
+  - shifts @done
+  - increment and decrement @done
+  - add, sub @done
+  - (i)mul and (i)div
+- stack manipulation @done
+
 # 2025-12-30
 
 - assembly code parser @done

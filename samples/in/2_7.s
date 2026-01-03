@@ -6,6 +6,8 @@
     e: .long 0x15
 
 .text
+.global main
+main:
     mov $4, %eax
     mov $1, %ebx
     mov $a, %ecx
@@ -13,4 +15,8 @@
     sub %ecx, %edi
     or %edi, e
     mov e, %edx
+    int $0x80
+
+    mov $1, %eax
+    mov $0, %ebx
     int $0x80
