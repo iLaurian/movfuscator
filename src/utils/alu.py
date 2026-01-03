@@ -291,6 +291,9 @@ def translate_alu_instruction(opcode, operands):
     def movb(src, dst):
         emit(f"movb {src}, {dst}")
 
+    def movw(src, dst):
+        emit(f"movw {src}, {dst}")
+
     def get_op_str(op):
         if op[0] == 'imm': return 'imm', f"${op[1]}"
         if op[0] == 'reg': return 'reg', op[1]
@@ -308,11 +311,11 @@ def translate_alu_instruction(opcode, operands):
             mov(r, f"backup_{r[1:]}")
 
     def restore_regs(skip_reg=None):
+        if skip_reg is None: skip_reg = []
         emit("# -- context restore --")
         regs = ['%eax', '%ebx', '%ecx', '%edx', '%esi', '%edi']
         for r in regs:
-            if skip_reg and r == skip_reg:
-                continue
+            if r in skip_reg: continue
             mov(f"backup_{r[1:]}", r)
 
     # Load operand into memory scratchpad (alu_x or alu_y)
@@ -380,20 +383,20 @@ def translate_alu_instruction(opcode, operands):
 
         # low 16 bits calculation
         emit(f"# -- add32 low --")
-        mov("$0", "%eax");
+        mov("$0", "%eax")
         mov("$0", "%ecx")  # Zero registers
-        emit(f"movw {x}+0, %ax")
-        emit(f"movw {y}+0, %cx")
+        movw(f"{x}+0", "%ax")
+        movw(f"{y}+0", "%cx")
 
-        emit("movl alu_add16(,%eax,4), %edx")
-        emit("movl (%edx,%ecx,4), %edx")
+        mov("alu_add16(,%eax,4)", "%edx")
+        mov("(%edx,%ecx,4)", "%edx")
 
         if c_in_loc:
-            mov(c_in_loc, "%ecx")  # ecx = carry (0 or 1)
-            emit("movl alu_add16(,%edx,4), %eax")
-            emit("movl (%eax,%ecx,4), %edx")
+            mov(c_in_loc, "%ecx")  #    ecx = carry (0 or 1)
+            mov("alu_add16(,%edx,4)", "%eax")
+            mov("(%eax,%ecx,4)", "%edx")
 
-        emit(f"movw %dx, {res}+0")
+        movw("%dx", f"{res}+0")
 
         # Calculate Carry Out
         # %edx structure: [0:Low][1:High][2:Carry][3:0]
@@ -405,24 +408,31 @@ def translate_alu_instruction(opcode, operands):
         mov("$0", "%ecx")
         movb("alu_t+2", "%cl")  # Carry is now in %ecx
 
-        # high16 bits calculation
+        # high 16 bits calculation
         emit(f"# -- add32 high --")
         mov("$0", "%eax")
-        emit(f"movw {x}+2, %ax")  # eax = High(x)
+        movw(f"{x}+2", "%ax")  # eax = High(x)
 
         # edx = eax + ecx (carry)
-        emit("movl alu_add16(,%eax,4), %edx")
-        emit("movl (%edx,%ecx,4), %edx")
+        mov("alu_add16(,%eax,4)", "%edx")
+        mov("(%edx,%ecx,4)", "%edx")
         mov("%edx", "%eax")  # Put result back in eax
 
         # Now add High(y)
         mov("$0", "%ecx")
-        emit(f"movw {y}+2, %cx")
-        emit("movl alu_add16(,%eax,4), %edx")
-        emit("movl (%edx,%ecx,4), %edx")
+        movw(f"{y}+2", "%cx")
+        mov("alu_add16(,%eax,4)", "%edx")
+        mov("(%edx,%ecx,4)", "%edx")
 
         # Save High Result
-        emit(f"movw %dx, {res}+2")
+        movw("%dx", f"{res}+2")
+
+        if c_in_loc:
+            # If sum > 65535, the overflow bit is in byte 2 (index 2).
+            mov("%edx", "alu_t")
+            mov("$0", "%eax")
+            movb("alu_t+2", "%al")  # Extract the carry bit (0 or 1)
+            movb("%al", c_in_loc)  # Write it to the carry variable
 
     def impl_alu_sub32(res, x, y, c="alu_c"):
         emit(f"# alu_sub32 {res} = {x} - {y}")
@@ -444,9 +454,12 @@ def translate_alu_instruction(opcode, operands):
             mov("$0", "%ebx")
             movb(f"{x}+{i}", "%al")
             movb(f"{y}+{i}", "%bl")
-            emit(f"movl {table_name}(,%eax,4), %ecx")
-            emit(f"movb (%ecx,%ebx), %dl")
+            mov(f"{table_name}(,%eax,4)", "%ecx")
+            movb("(%ecx,%ebx)", "%dl")
             movb("%dl", f"{res}+{i}")
+
+    def impl_alu_bxor8(res, x, y):
+        impl_bitwise("xor", "alu_bxor8", res, x, y)
 
     def impl_alu_not(res, x):
         emit(f"# alu_not")
@@ -460,6 +473,215 @@ def translate_alu_instruction(opcode, operands):
         emit(f"# alu_neg")
         mov("$0", "alu_z1")
         impl_alu_sub32(res, "alu_z1", x)
+
+    def conditional_negate(target, cond_var, table_label):
+        mov(target, "%ecx")
+        mov(target, "%edx")
+        mov("%edx", "alu_x")
+        impl_alu_neg("alu_s", "alu_x")
+
+        emit(".section .data")
+        emit(f".align 4")
+        emit(f"{table_label}: .long discard, {target}")
+        emit(".text")
+
+        mov(cond_var, "%eax")
+        mov(f"{table_label}(,%eax,4)", "%eax")
+        mov("alu_s", "%edx")
+        mov("%edx", "(%eax)")
+
+    def alu_add8n(s, s_off, c, x, x_off, y, y_off, extra_args=[]):
+        # Adds bytes with carry using lookup tables
+        emit("# alu_add8n")
+        mov("$0", "%ebx")
+        mov("$0", "%edx")
+        mov("$0", "%eax")
+
+        # Initial Sum: val(x) + val(y)
+        movb(f"{x}+{x_off}", "%al")
+        movb(f"{y}+{y_off}", "%dl")
+        mov("alu_mul_shl2(,%eax,4)", "%eax")  # Scale x
+        mov("alu_mul_shl2(,%edx,4)", "%edx")  # Scale y
+        mov("alu_mul_sums(%eax,%edx)", "%edx")  # Sum scaled
+
+        # Add extra terms (previous carries or partials)
+        for i in range(0, len(extra_args), 2):
+            p = extra_args[i]
+            o = extra_args[i + 1]
+            mov("$0", "%eax")
+            movb(f"{p}+{o}", "%al")
+            mov("alu_mul_shl2(,%edx,4)", "%edx")  # Rescale current sum
+            mov("alu_mul_shl2(,%eax,4)", "%eax")  # Scale new term
+            mov("movl alu_mul_sums(%eax,%edx)", "%edx")  # Add
+
+        # Store Result (Low byte) and Carry (High byte)
+        movb("%dl", f"{s}+{s_off}")
+        movb("%dh", f"{c}")
+
+    def alu_mul8(s, s_off, x, x_off, y, y_off, c):
+        # 8-bit Multiply: s[off] = x[off] * y[off] + c
+        emit("# alu_mul8")
+        mov("$0", "%eax")
+        mov("$0", "%ebx")
+        mov("$0", "%ecx")
+        mov("$0", "%edx")
+
+        movb(f"{x}+{x_off}", "%al")
+        movb(f"{y}+{y_off}", "%dl")
+
+        # Low byte of product
+        mov("alu_mul_mul8l(,%eax,4)", "%ebx")
+        movb("(%ebx,%edx)", "%cl")
+
+        # High byte of product
+        mov("alu_mul_mul8h(,%eax,4)", "%ebx")
+        movb("(%ebx,%edx)", "%al")  # al = high part
+
+        # Add Input Carry
+        mov("$0", "%ebx")
+        movb(f"{c}", "%dl")
+        movb("alu_mul_sum8l(%ecx,%edx)", "%dl")  # low + carry
+        movb("%dl", f"{s}+{s_off}")  # Store result byte
+
+        # Calc Output Carry
+        movb(f"{c}", "%dl")
+        movb("alu_mul_sum8h(%ecx,%edx)", "%dl")  # carry of (low+carry)
+        movb("alu_mul_sum8l(%edx,%eax)", "%dl")  # + high part
+        movb("%dl", f"{c}")  # Store new carry
+
+    def impl_alu_mul32(s, x, y, c="alu_c"):
+        emit(f"# -- mul32 {s} = {x} * {y} --")
+        # Clear scratch accumulators
+        for z in ["alu_z0", "alu_z1", "alu_z2", "alu_z3"]:
+            mov("$0", z)
+
+        # Partial Products Row 0
+        mov("$0", c)
+        alu_mul8("alu_z0", 0, x, 0, y, 0, c)
+        alu_mul8("alu_z0", 1, x, 1, y, 0, c)
+        alu_mul8("alu_z0", 2, x, 2, y, 0, c)
+        alu_mul8("alu_z0", 3, x, 3, y, 0, c)
+
+        # Partial Products Row 1
+        mov("$0", c)
+        alu_mul8("alu_z1", 1, x, 0, y, 1, c)
+        alu_mul8("alu_z1", 2, x, 1, y, 1, c)
+        alu_mul8("alu_z1", 3, x, 2, y, 1, c)
+
+        # Partial Products Row 2
+        mov("$0", c)
+        alu_mul8("alu_z2", 2, x, 0, y, 2, c)
+        alu_mul8("alu_z2", 3, x, 1, y, 2, c)
+
+        # Partial Products Row 3
+        mov("$0", c)
+        alu_mul8("alu_z3", 3, x, 0, y, 3, c)
+
+        # Summation
+        mov("$0", c)
+        alu_add8n(s, 0, c, "alu_z0", 0, "alu_c", 0)  # just z0+0 (alu_c is 0 here essentially)
+        alu_add8n(s, 0, c, "alu_c", 2, "alu_z0", 0)
+        alu_add8n(s, 0, c, "alu_z0", 0, "alu_c", 0)
+        alu_add8n(s, 1, c, "alu_z0", 1, "alu_z1", 1, extra_args=["alu_c", 0])
+        alu_add8n(s, 2, c, "alu_z0", 2, "alu_z1", 2, extra_args=["alu_z2", 2, "alu_c", 0])
+        alu_add8n(s, 3, c, "alu_z0", 3, "alu_z1", 3, extra_args=["alu_z2", 3, "alu_z3", 3, "alu_c", 0])
+
+    def alu_bit(s, x, n):
+        # Extract bit n from x into s
+        emit(f"# alu_bit {x}[{n}] -> {s}")
+        mov("$0", "%edx")
+        byte_off = n // 8
+        bit_idx = n % 8
+        movb(f"{x}+{byte_off}", "%dl")
+        mov(f"alu_b{bit_idx}(,%edx,4)", "%eax")
+        mov("%eax", s)
+
+    def alu_div_shl1_8_c(s, s_off, c):
+        # Shift byte left 1, shifting in carry c
+        emit("# shl1_8_c")
+        mov("$0", "%eax");
+        mov("$0", "%edx")
+        movb(f"{s}+{s_off}", "%al")
+        movb(f"{c}", "%dl")
+        mov("alu_div_shl3_8_d(,%eax,4)", "%eax")
+        mov("alu_div_shl1_8_c_d(%eax,%edx,4)", "%eax")
+        movb("%al", f"{s}+{s_off}")
+        movb("%ah", f"{c}")
+
+    def alu_div_shl1_32_c(s, c):
+        # Shift 32-bit left 1
+        alu_div_shl1_8_c(s, 0, c)
+        alu_div_shl1_8_c(s, 1, c)
+        alu_div_shl1_8_c(s, 2, c)
+        alu_div_shl1_8_c(s, 3, c)
+
+    def alu_div_gte32(s, x, y, c):
+        # Check if x >= y. Result (0 or 1) in s
+        mov("$0", c)
+
+        mov(x, "%eax");
+        mov("%eax", "alu_x")
+        mov(y, "%eax");
+        mov("%eax", "alu_y")
+
+        impl_alu_sub32(s, "alu_x", "alu_y", c)
+
+        mov("$0", "%eax")
+        movb(f"{c}", "%al")
+        movb("alu_true(%eax)", "%al")
+        mov("%eax", s)
+
+    def alu_div_setb32(s, n):
+        # Set bit n in s
+        byte_off = n // 8
+        bit_idx = n % 8
+        mov("$0", "%eax")
+        movb(f"{s}+{byte_off}", "%al")
+        movb(f"alu_b_s_{bit_idx}(%eax)", "%al")
+        movb("%al", f"{s}+{byte_off}")
+
+    def impl_alu_divrem(n, d):
+        emit(f"# -- divrem n={n} d={d} --")
+
+        mov(n, "%eax")
+        mov("%eax", "alu_n")
+        mov(d, "%eax")
+        mov("%eax", "alu_d")
+
+        mov("$0", "alu_q")
+        mov("$0", "alu_r")
+
+        for bit in range(31, -1, -1):
+            alu_bit("alu_c", "alu_n", bit)
+            alu_div_shl1_32_c("alu_r", "alu_c")
+
+            alu_div_gte32("alu_t", "alu_r", "alu_d", "alu_c")
+
+            mov("alu_t", "%eax")
+            mov("alu_sel_r(,%eax,4)", "%edx")
+            mov("%edx", "alu_psel_r")
+            mov("alu_sel_q(,%eax,4)", "%edx")
+            mov("%edx", "alu_psel_q")
+
+            mov("alu_r", "%eax")
+            mov("%eax", "alu_x")
+            mov("alu_d", "%eax")
+            mov("%eax", "alu_y")
+
+            impl_alu_sub32("alu_sr", "alu_x", "alu_y", "alu_c")
+
+            mov("alu_psel_r", "%eax")
+            mov("alu_sr", "%edx")
+            emit("movl %edx, (%eax)")
+
+            # Set Quotient Bit: Q[bit] = 1 if R>=D
+            mov("alu_psel_q", "%eax")
+            mov("(%eax)", "%eax")
+            mov("%eax", "alu_sq")
+            alu_div_setb32("alu_sq", bit)
+            mov("alu_psel_q", "%eax")
+            mov("alu_sq", "%edx")
+            mov("%edx", "(%eax)")
 
     # Dispatch
 
@@ -535,6 +757,68 @@ def translate_alu_instruction(opcode, operands):
         d_type, d_val = get_op_str(operands[0])
         if d_type == 'reg': dest_reg = d_val
         restore_regs(skip_reg=dest_reg)
+
+    elif opcode in ['mul', 'imul']:
+        save_regs()
+
+        src_op = operands[0]
+        dst_op = operands[1] if len(operands) > 1 else ('reg', '%eax')
+
+        load_to_scratch(src_op, "alu_x")
+        load_to_scratch(dst_op, "alu_y")
+
+        impl_alu_mul32("alu_s", "alu_x", "alu_y")
+
+        write_back("alu_s", dst_op)
+        dest_reg = dst_op[1] if dst_op[0] == 'reg' else None
+        restore_regs(skip_reg=dest_reg)
+
+    elif opcode == 'div':
+        save_regs()
+        src_op = operands[0]
+
+        load_to_scratch(src_op, "alu_d")
+        mov("%eax", "alu_n")
+
+        impl_alu_divrem("alu_n", "alu_d")
+
+        mov("alu_q", "%eax")
+        mov("alu_r", "%edx")
+
+        restore_regs(skip_reg=['%eax', '%edx'])
+
+
+    elif opcode == 'idiv':
+        save_regs()
+
+        src_op = operands[0]
+        load_to_scratch(src_op, "alu_d")
+        mov("%eax", "alu_n")
+        mov("$0", "%eax")
+        movb("alu_n+3", "%al")
+        mov("alu_b7(,%eax,4)", "%eax")
+        mov("%eax", "alu_ns")
+        mov("$0", "%eax")
+        movb("alu_d+3", "%al")
+        mov("alu_b7(,%eax,4)", "%eax")
+        mov("%eax", "alu_ds")
+
+        load_to_scratch(('mem', 'alu_ns'), "alu_x")
+        load_to_scratch(('mem', 'alu_ds'), "alu_y")
+        impl_alu_bxor8("alu_qs", "alu_x", "alu_y")
+
+        mov("alu_ns", "%eax")
+        mov("%eax", "alu_rs")
+
+        conditional_negate("alu_n", "alu_ns", "sel_abs_n")
+        conditional_negate("alu_d", "alu_ds", "sel_abs_d")
+        impl_alu_divrem("alu_n", "alu_d")
+        conditional_negate("alu_q", "alu_qs", "sel_neg_q")
+        conditional_negate("alu_r", "alu_rs", "sel_neg_r")
+
+        mov("alu_q", "%eax")
+        mov("alu_r", "%edx")
+        restore_regs(skip_reg=['%eax', '%edx'])
 
     else:
         # Pass through mov, lea, int, etc.
