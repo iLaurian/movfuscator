@@ -599,7 +599,7 @@ def translate_alu_instruction(opcode, operands):
     def alu_div_shl1_8_c(s, s_off, c):
         # Shift byte left 1, shifting in carry c
         emit("# shl1_8_c")
-        mov("$0", "%eax");
+        mov("$0", "%eax")
         mov("$0", "%edx")
         movb(f"{s}+{s_off}", "%al")
         movb(f"{c}", "%dl")
@@ -619,9 +619,9 @@ def translate_alu_instruction(opcode, operands):
         # Check if x >= y. Result (0 or 1) in s
         mov("$0", c)
 
-        mov(x, "%eax");
+        mov(x, "%eax")
         mov("%eax", "alu_x")
-        mov(y, "%eax");
+        mov(y, "%eax")
         mov("%eax", "alu_y")
 
         impl_alu_sub32(s, "alu_x", "alu_y", c)

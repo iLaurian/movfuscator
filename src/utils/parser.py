@@ -97,20 +97,34 @@ def parse_operand(operand):
     else:
         return 'mem', operand
 
-def parse_asm_source(lines):
+def parse_asm_source(lines, start_parsing_at=None):
     """
     Parses ASM source file and returns a list of processed lines.
-    :param lines: list of lines to process representing the source assembly file.
+    :param lines: list of lines to process representing the source assembly file and an instruction from which to start processing.
     :return: a list of processed lines with the following format: [(assembler_directive, args), (label, [dtype, value]), ..., (opcode, [(addressing_mode, value)...])].
     """
     parsed_output = []
     current_section = None
 
+    parsing_active = (start_parsing_at is None)
+
     data_pattern = re.compile(r'^\s*([a-zA-Z_][a-zA-Z0-9_]*):\s*(\.[a-z]+)\s+(.*)')
     label_pattern = re.compile(r'^\s*([a-zA-Z_][a-zA-Z0-9_]*):\s*$')
 
+    start_trigger = None
+    if start_parsing_at:
+        start_trigger = re.compile(r'^\s*' + re.escape(start_parsing_at) + r':')
+
     for line in lines:
         clean_line = line.split('#')[0].strip()
+
+        if not parsing_active:
+            if clean_line and start_trigger and start_trigger.match(clean_line):
+                parsing_active = True
+
+            else:
+                parsed_output.append(line.rstrip('\n'))
+                continue
 
         if not clean_line:
             continue

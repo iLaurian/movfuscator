@@ -1,5 +1,6 @@
 from utils.parser import *
 from utils.alu import *
+from utils.branching import *
 import pprint
 
 if __name__ == '__main__':
@@ -13,9 +14,14 @@ if __name__ == '__main__':
         sys.exit(1)
 
     assembly_code = parse_asm_source(content)
-    # pprint.pp(assembly_code)
+    pprint.pp(assembly_code)
 
-    final_assembly_lines = process_alu_parsed_lines(assembly_code)
+    # final_assembly_lines = process_alu_parsed_lines(assembly_code)
+    processed_alu_assembly = process_alu_parsed_lines(assembly_code)
+
+    assembly_code = parse_asm_source(processed_alu_assembly, "main:")
+
+    final_assembly_lines = process_branching_parsed_lines(assembly_code)
 
     try:
         with open(output_filename, 'w') as f:

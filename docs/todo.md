@@ -1,3 +1,8 @@
+# 2026-01-09
+
+- update flags
+- implement cmp, test, loop
+
 # 2026-01-03
 
 - implement alu with moves and flags
@@ -5,7 +10,7 @@
   - shifts @done
   - increment and decrement @done
   - add, sub @done
-  - (i)mul and (i)div
+  - (i)mul and (i)div @done
 - stack manipulation @done
 
 # 2025-12-30
