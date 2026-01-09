@@ -1,7 +1,10 @@
 # 2026-01-09
 
 - update flags
-- implement cmp, test, loop
+- implement 
+  - cmp 
+  - test @done
+  - loop
 
 # 2026-01-03
 

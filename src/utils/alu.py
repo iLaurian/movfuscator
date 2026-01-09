@@ -758,6 +758,23 @@ def translate_alu_instruction(opcode, operands):
         if d_type == 'reg': dest_reg = d_val
         restore_regs(skip_reg=dest_reg)
 
+    elif opcode == 'test':
+        # test A, B <=> push B
+        #               and A, B
+        #               pop B
+        save_regs()
+
+        impl_push(operands[1])
+
+        load_to_scratch(operands[0], "alu_x")
+        load_to_scratch(operands[1], "alu_y")
+        impl_bitwise('and', 'alu_band8', "alu_s", "alu_x", "alu_y")
+        write_back("alu_s", operands[1])
+
+        impl_pop(operands[1])
+
+        restore_regs()
+
     elif opcode in ['mul', 'imul']:
         save_regs()
 
