@@ -72,9 +72,11 @@ class Instruction:
 class BranchingFuscator:
   def __init__(self, file):
     self.file = file
+    self.lines = []
 
   def emit(self, code: str):
-    self.file.write(code + '\n')
+    self.lines.append(code)
+    # self.file.write(code + '\n')
   
   def initialize_startup_routines(self):
     self.emit(f"""
@@ -1624,8 +1626,13 @@ assembly_code__ALL_JUMPS = [
     ("\tint",  [("imm", "$0x80")])
 ]
 
-with open("test1.s", "w") as f:
-  obfuscator = BranchingFuscator(f)
-  obfuscator.emit_final_assembly(assembly_code__ALL_JUMPS)
+def process_branching_parsed_lines(assembly_code):
+  obfuscator = BranchingFuscator(None)
+  obfuscator.emit_final_assembly(assembly_code)
+  return obfuscator.lines
+
+# with open("test1.s", "w") as f:
+#   obfuscator = BranchingFuscator(f)
+#   obfuscator.emit_final_assembly(assembly_code__ALL_JUMPS)
 
 
