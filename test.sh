@@ -8,9 +8,9 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo -e "${BLUE}======================================================${NC}"
-echo -e "${BLUE}       ALU TRANSPILER VERIFICATION TEST RUNNER        ${NC}"
-echo -e "${BLUE}======================================================${NC}"
+echo -e "${BLUE}=======================================================${NC}"
+echo -e "${BLUE}          TRANSPILER VERIFICATION TEST RUNNER          ${NC}"
+echo -e "${BLUE}=======================================================${NC}"
 
 if [ ! -d "$IN_DIR" ]; then
     echo -e "${RED}Error: Directory '$IN_DIR' not found.${NC}"
@@ -37,23 +37,25 @@ for in_source in "$IN_DIR"/*.s; do
         continue
     fi
 
-    gcc -m32 "$in_source" -o "$exe_in" -w -no-pie
+    compile_out_ref=$(gcc -m32 "$in_source" -o "$exe_in" -w -no-pie 2>&1)
     if [ $? -ne 0 ]; then
         echo -e "${RED}[COMPILE ERROR]${NC} Failed to compile reference '$in_source'"
+        echo "$compile_out_ref"
         continue
     fi
 
-    gcc -m32 "$out_source" -o "$exe_out" -w -no-pie
+    compile_out_alu=$(gcc -m32 "$out_source" -o "$exe_out" -w -no-pie 2>&1)
     if [ $? -ne 0 ]; then
         echo -e "${RED}[COMPILE ERROR]${NC} Failed to compile transformed '$out_source'"
+        echo "$compile_out_alu"
         rm -f "$exe_in"
         continue
     fi
 
-    output_ref=$("$exe_in" 2>&1)
+    output_ref=$("$exe_in" 2>&1 | tr -d '\0')
     ret_ref=$?
 
-    output_alu=$("$exe_out" 2>&1)
+    output_alu=$("$exe_out" 2>&1 | tr -d '\0')
     ret_alu=$?
 
     fail=0
@@ -83,6 +85,6 @@ for in_source in "$IN_DIR"/*.s; do
 
 done
 
-echo -e "\n${BLUE}======================================================${NC}"
-echo -e "${BLUE}                   TEST RUN COMPLETE                  ${NC}"
-echo -e "${BLUE}======================================================${NC}"
+echo -e "\n${BLUE}=======================================================${NC}"
+echo -e "${BLUE}                   TEST RUN COMPLETE                   ${NC}"
+echo -e "${BLUE}=======================================================${NC}"

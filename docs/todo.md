@@ -2,6 +2,7 @@
 
 - sync `%esp` to `sp` for external functions to work @done
 - create bash scripts to automate testing @done
+- shifts @done
 
 # 2026-01-09
 
@@ -16,7 +17,6 @@
 
 - implement alu with moves and flags
   - logical and, or, xor, not @done
-  - shifts
   - increment and decrement @done
   - add, sub @done
   - (i)mul and (i)div @done

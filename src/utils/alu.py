@@ -130,8 +130,9 @@ def generate_alu_tables():
     build_2d_table("alu_bor8", "byte", 256, 256, lambda x, y: x | y)
     build_2d_table("alu_bxor8", "byte", 256, 256, lambda x, y: x ^ y)
 
-    # Shift Tables
-    # Left Shift
+    # SHIFT TABLES
+
+    # Left Shift (Unsigned)
     build_2d_table("alu_lshu8", "long", 33, 256,
                    lambda x, y: 0 if x > 31 else (y << x))
 
@@ -139,12 +140,14 @@ def generate_alu_tables():
     build_2d_table("alu_rshu8", "long", 33, 256,
                    lambda x, y: 0 if x > 31 else ((y << 24) & 0xFFFFFFFF) >> x)
 
-    # Right Shift (Signed) - emulate sign extension byte placement
+    # Right Shift (Signed)
     def rshi_func(x, y):
         if x > 31: return 0xFFFFFFFF
-        val = (y & 0x80) << 24  # place sign bit at MSB
-        # Arithmetic shift is tricky in python without types, simplified logic:
-        return (val >> x)
+        val = (y & 0x80) << 24
+        if val:
+            mask = (0xFFFFFFFF << (32 - x)) & 0xFFFFFFFF
+            return ((val >> x) | mask) & 0xFFFFFFFF
+        return 0
 
     build_2d_table("alu_rshi8s", "long", 33, 256, rshi_func)
 
@@ -211,6 +214,11 @@ def generate_alu_tables():
 
     # Deep Scratch (Shift/Mul/Div)
     emit(".align 16")
+
+    # Padding for shift operations
+    # We write to (alu_s0 - 3), so we need valid memory before alu_s0.
+    emit("alu_pad_pre: .fill 16, 1, 0")
+
     scratch_vars = [
         "alu_s0", "alu_s1", "alu_s2", "alu_s3", "alu_ss", "alu_sc", "alu_sx",
         "alu_z0", "alu_z1", "alu_z2", "alu_z3",
@@ -490,6 +498,108 @@ def translate_alu_instruction(opcode, operands):
         mov("$0", "%eax")
         movb("b0", "%al")
         movb("%al", "cf")
+
+    def prepare_shift(count_op, dest_op):
+        load_to_scratch(count_op, "alu_x")
+        load_to_scratch(dest_op, "alu_y")
+
+        mov("alu_x", "%eax")
+        mov("alu_clamp32(,%eax,4)", "%eax")
+        mov("%eax", "alu_x")
+
+        mov("$0", "alu_s0")
+        mov("$0", "alu_s1")
+        mov("$0", "alu_s2")
+        mov("$0", "alu_s3")
+        mov("$0", "alu_ss")
+
+    def combine_scratch_to_s():
+        mov("alu_s0", "%eax")
+        emit("or alu_s1, %eax")
+        emit("or alu_s2, %eax")
+        emit("or alu_s3, %eax")
+        emit("or alu_ss, %eax")
+        mov("%eax", "alu_s")
+
+    def impl_alu_shl(count_op, dest_op):
+        emit("# -- alu_shl --")
+        prepare_shift(count_op, dest_op)
+
+        mov("alu_x", "%eax")
+        mov("alu_lshu8(,%eax,4)", "%edx")
+
+        mov("$0", "%eax")
+        movb("alu_y+0", "%al")
+        mov("(%edx,%eax,4)", "%ecx")
+        mov("%ecx", "alu_s0")
+
+        mov("$0", "%eax")
+        movb("alu_y+1", "%al")
+        mov("(%edx,%eax,4)", "%ecx")
+        mov("%ecx", "alu_s1")
+
+        mov("$0", "%eax")
+        movb("alu_y+2", "%al")
+        mov("(%edx,%eax,4)", "%ecx")
+        mov("%ecx", "alu_s2")
+
+        mov("$0", "%eax")
+        movb("alu_y+3", "%al")
+        mov("(%edx,%eax,4)", "%ecx")
+        mov("%ecx", "alu_s3")
+
+        combine_scratch_to_s()
+        write_back("alu_s", dest_op)
+        emit_update_zf_sf("alu_s")
+
+    def impl_alu_shr(count_op, dest_op):
+        emit("# -- alu_shr --")
+        prepare_shift(count_op, dest_op)
+
+        mov("alu_x", "%eax")
+        mov("alu_rshu8(,%eax,4)", "%edx")
+
+        mov("$0", "%eax")
+        movb("alu_y+0", "%al")
+        mov("(%edx,%eax,4)", "%ecx")
+        mov("%ecx", "alu_s0-3")
+
+        mov("$0", "%eax")
+        movb("alu_y+1", "%al")
+        mov("(%edx,%eax,4)", "%ecx")
+        mov("%ecx", "alu_s1-2")
+
+        mov("$0", "%eax")
+        movb("alu_y+2", "%al")
+        mov("(%edx,%eax,4)", "%ecx")
+        mov("%ecx", "alu_s2-1")
+
+        mov("$0", "%eax")
+        movb("alu_y+3", "%al")
+        mov("(%edx,%eax,4)", "%ecx")
+        mov("%ecx", "alu_s3")
+
+        combine_scratch_to_s()
+        write_back("alu_s", dest_op)
+        emit_update_zf_sf("alu_s")
+
+    def impl_alu_sar(count_op, dest_op):
+        emit("# -- alu_sar --")
+        impl_alu_shr(count_op, dest_op)
+
+        mov("alu_x", "%eax")
+        mov("alu_rshi8s(,%eax,4)", "%edx")
+
+        mov("$0", "%eax")
+        movb("alu_y+3", "%al")
+        mov("(%edx,%eax,4)", "%ecx")
+
+        mov("alu_s", "%eax")
+        emit("or %ecx, %eax")
+        mov("%eax", "alu_s")
+
+        write_back("alu_s", dest_op)
+        emit_update_zf_sf("alu_s")
 
 
     def impl_lea(dest_op, mem_op):
@@ -950,6 +1060,24 @@ def translate_alu_instruction(opcode, operands):
         impl_dec_helper(operands[0])
         d_reg = operands[0][1] if operands[0][0] == 'reg' else None
         restore_regs(skip_reg=d_reg)
+
+    elif opcode in ['shl', 'sal']:
+        save_regs()
+        impl_alu_shl(operands[0], operands[1])
+        dest_reg = operands[1][1] if operands[1][0] == 'reg' else None
+        restore_regs(skip_reg=dest_reg)
+
+    elif opcode == 'shr':
+        save_regs()
+        impl_alu_shr(operands[0], operands[1])
+        dest_reg = operands[1][1] if operands[1][0] == 'reg' else None
+        restore_regs(skip_reg=dest_reg)
+
+    elif opcode == 'sar':
+        save_regs()
+        impl_alu_sar(operands[0], operands[1])
+        dest_reg = operands[1][1] if operands[1][0] == 'reg' else None
+        restore_regs(skip_reg=dest_reg)
 
     elif opcode == 'add':
         save_regs()
