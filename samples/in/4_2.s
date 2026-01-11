@@ -6,30 +6,30 @@
 .text
 .global main
 main:
-    movl n, %ecx
-    movl $10, %ebx
+    mov n, %ecx
+    mov $10, %ebx
 
 et_loop:
     cmp $0, %ecx
     je et_afisare
-    movl %ecx, %eax
-    xorl %edx, %edx
-    divl %ebx
-    addl %edx, s
-    movl %eax, %ecx
+    mov %ecx, %eax
+    xor %edx, %edx
+    div %ebx
+    add %edx, s
+    mov %eax, %ecx
     jmp et_loop
 
 et_afisare:
-    pushl s
+    push s
     push $formatAfSuma
     call printf
-    popl %ebx
-    popl %ebx
-    pushl stdout
+    pop %ebx
+    pop %ebx
+    push stdout
     call fflush
-    addl $4, %esp
+    add $4, %esp
 
 et_exit:
-    movl $1, %eax
-    xorl %ebx, %ebx
+    mov $1, %eax
+    xor %ebx, %ebx
     int $0x80

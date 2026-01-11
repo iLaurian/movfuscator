@@ -1,16 +1,22 @@
+# 2025-01-11
+
+- sync `%esp` to `sp` for external functions to work @done
+- create bash scripts to automate testing @done
+
 # 2026-01-09
 
-- update flags
+- update flags @done
 - implement 
-  - cmp 
+  - cmp @done
   - test @done
-  - loop
+  - loop @done
+  - lea @done
 
 # 2026-01-03
 
 - implement alu with moves and flags
   - logical and, or, xor, not @done
-  - shifts @done
+  - shifts
   - increment and decrement @done
   - add, sub @done
   - (i)mul and (i)div @done

@@ -7,40 +7,40 @@
 .text
 .global main
 main:
-    movl n, %ecx
-    movl $v, %edi
+    mov n, %ecx
+    mov $v, %edi
 
 et_loop:
-    movl n, %ebx
-    subl %ecx, %ebx
-    movl (%edi, %ebx, 4), %edx
+    mov n, %ebx
+    sub %ecx, %ebx
+    mov (%edi, %ebx, 4), %edx
     cmp maxim, %edx
     jg et_max_nou
     loop et_loop
     jmp cont_max
 
 et_max_nou:
-    movl %edx, maxim
+    mov %edx, maxim
     loop et_loop
 
 cont_max:
-    movl n, %ecx
-    movl $v, %edi
+    mov n, %ecx
+    mov $v, %edi
 
 loop_ap:
-    movl n, %ebx
-    subl %ecx, %ebx
-    movl (%edi, %ebx, 4), %edx
+    mov n, %ebx
+    sub %ecx, %ebx
+    mov (%edi, %ebx, 4), %edx
     cmp maxim, %edx
     je et_egale
     loop loop_ap
     jmp et_exit
 
 et_egale:
-    incl ap
+    inc ap
     loop loop_ap
 
 et_exit:
-    movl $1, %eax
-    xorl %ebx, %ebx
+    mov $1, %eax
+    xor %ebx, %ebx
     int $0x80

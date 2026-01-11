@@ -8,46 +8,46 @@
 .text
 .global main
 main:
-    movl n, %ecx
+    mov n, %ecx
     lea v, %edi
-    xorl %eax, %eax
+    xor %eax, %eax
 
 et_parcurgere:
     cmp $0, %ecx
     je et_afisare
-    movl (%edi, %eax, 4), %edx
-    movl max1, %ebx
+    mov (%edi, %eax, 4), %edx
+    mov max1, %ebx
     cmp %ebx, %edx
     jle verifica_max2
 
-    movl %ebx, max2
-    movl %edx, max1
+    mov %ebx, max2
+    mov %edx, max1
     jmp et_cont_parcurgere
 
 verifica_max2:
-    movl max2, %ebx
+    mov max2, %ebx
     cmp %ebx, %edx
     jle et_cont_parcurgere
-    movl max1, %esi
+    mov max1, %esi
     cmp %esi, %edx
     jge et_cont_parcurgere
 
-    movl %edx, max2
+    mov %edx, max2
 
 et_cont_parcurgere:
-    incl %eax
-    decl %ecx
+    inc %eax
+    dec %ecx
     jmp et_parcurgere
 
 et_afisare:
-    movl max2, %edx
-    pushl max2
-    pushl $formatAf
+    mov max2, %edx
+    push max2
+    push $formatAf
     call printf
-    popl %ebx
-    popl %ebx
+    pop %ebx
+    pop %ebx
 
 et_exit:
-    movl $1, %eax
-    xorl %ebx, %ebx
+    mov $1, %eax
+    xor %ebx, %ebx
     int $0x80

@@ -2,19 +2,19 @@
 .text
 .global main
 main:
-    movl $0, %ecx
-    movl $3, %eax
-    movl $5, %ebx
+    mov $0, %ecx
+    mov $3, %eax
+    mov $5, %ebx
     cmp %ebx, %eax
     jge greater_or_equal
 
-    movl $1, %ecx
+    mov $1, %ecx
     jmp end
 
 greater_or_equal:
-    movl $2, %ecx
+    mov $2, %ecx
 
 end:
-    movl $1, %eax
+    mov $1, %eax
     xor %ebx, %ebx
     int $0x80

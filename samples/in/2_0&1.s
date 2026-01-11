@@ -10,3 +10,7 @@ main:
     mov $str1, %ecx
     mov $5, %edx
     int $0x80
+
+    mov $1, %eax
+    xor %ebx, %ebx
+    int $0x80

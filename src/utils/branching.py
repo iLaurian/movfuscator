@@ -19,10 +19,10 @@ class Labels(Enum):
   REGISTER_ESP = "MVF_REGISTER_ESP"
 
   # ALU flags
-  FLAG_ZERO = "MVF_FLAG_ZERO"
-  FLAG_SIGN = "MVF_FLAG_SIGN"
-  FLAG_OVERFLOW = "MVF_FLAG_OVERFLOW"
-  FLAG_CARRY = "MVF_FLAG_CARRY"
+  FLAG_ZERO = "zf"
+  FLAG_SIGN = "sf"
+  FLAG_OVERFLOW = "of"
+  FLAG_CARRY = "cf"
 
   # Some function names for the runtime
   SETUP_FUNCTION_NAME = "MVF_SETUP"
@@ -94,11 +94,6 @@ class BranchingFuscator:
       {Labels.REGISTER_EDI.value}: .long 0
       {Labels.REGISTER_EBP.value}: .long 0
       {Labels.REGISTER_ESP.value}: .long 0
-              
-      {Labels.FLAG_ZERO.value}: .byte 0
-      {Labels.FLAG_SIGN.value}: .byte 0
-      {Labels.FLAG_OVERFLOW.value}: .byte 0
-      {Labels.FLAG_CARRY.value}: .byte 0
 
       {Labels.SIMPLE_AND_LOOKUP_TABLE.value}: .long {Labels.SIMPLE_AND_0_LOOKUP_TABLE.value}, {Labels.SIMPLE_AND_1_LOOKUP_TABLE.value}
       {Labels.SIMPLE_AND_0_LOOKUP_TABLE.value}: .long 0, 0
@@ -228,7 +223,7 @@ class BranchingFuscator:
     match instruction.mnemonic:
       # Jumps using EFLAGS
       case "jnc":
-        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, False)
+        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, False   )
       case "jc":
         self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, True)
       case "jns":
@@ -264,14 +259,14 @@ class BranchingFuscator:
       ## Unsigned inequalities
       case "jb":
         # CF == 1 (so same as jc)
-        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, True)
+        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, False)
       case "jbe":
         self.translate_jbe(instruction) # CF == 1 or ZF == 1
       case "ja":
         self.translate_ja(instruction)  # CF == 0 and ZF == 0
       case "jae":
         # CF == 0 (so same as jnc)
-        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, False)
+        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, True)
 
       case "cmp":
         self.translate_cmp(instruction)

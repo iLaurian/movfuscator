@@ -1,31 +1,31 @@
 .text
 .global main
 main:
-    movl $0b11011111111110111111, %eax
-    xorl %ebx, %ebx
-    xorl %ecx, %ecx
-    movl $32, %edx
+    mov $0b11011111111110111111, %eax
+    xor %ebx, %ebx
+    xor %ecx, %ecx
+    mov $32, %edx
 
 et_loop:
-    testl $1, %eax
+    test $1, %eax
     jz et_zero
-    incl %ecx
-    cmpl %ebx, %ecx
+    inc %ecx
+    cmp %ebx, %ecx
     jle et_next
-    movl %ecx, %ebx
+    mov %ecx, %ebx
 
 et_next:
-    shrl $1, %eax
-    decl %edx
+    shr $1, %eax
+    dec %edx
     jnz et_loop
     jmp et_exit
 
 et_zero:
-    xorl %ecx, %ecx
+    xor %ecx, %ecx
     jmp et_next
 
 et_exit:
-    movl %ebx, %eax
-    movl $1, %ebx
-    movl $1, %eax
+    mov %ebx, %eax
+    mov $1, %ebx
+    mov $1, %eax
     int $0x80

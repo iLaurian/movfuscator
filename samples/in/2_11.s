@@ -4,19 +4,19 @@
 .text
 .global main
 main:
-    movl n, %ecx
-    xorl %eax, %eax
-    xorl %ebx, %ebx
+    mov n, %ecx
+    xor %eax, %eax
+    xor %ebx, %ebx
 et_loop:
-    cmpl $0, %ecx
+    cmp $0, %ecx
     je et_exit
-    movl %ecx, %eax
-    mull %eax
-    addl %eax, %ebx
-    decl %ecx
+    mov %ecx, %eax
+    mul %eax
+    add %eax, %ebx
+    dec %ecx
     jmp et_loop
 et_exit:
-    movl %ebx, s
-    movl $1, %eax
-    xorl %ebx, %ebx
+    mov %ebx, s
+    mov $1, %eax
+    xor %ebx, %ebx
     int $0x80

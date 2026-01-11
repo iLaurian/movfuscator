@@ -11,7 +11,7 @@ main:
     subl $3, %ecx
 
 et_loop:
-    cmpl $0, %ecx
+    cmp $0, %ecx
     je et_exit
 
     mov t0, %eax

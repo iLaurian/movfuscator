@@ -9,48 +9,48 @@
 .extern printf
 
 main:
-    movl n, %ecx
+    mov n, %ecx
     lea v, %edi
-    xorl %eax, %eax
+    xor %eax, %eax
 
 et_tablou_frecv:
     cmp $0, %ecx
     je et_parcurgere
-    movl (%edi, %eax, 4), %ebx
+    mov (%edi, %eax, 4), %ebx
     lea frecv, %esi
-    movl (%esi, %ebx, 4), %edx
-    addl $1, %edx
-    movl %edx, (%esi, %ebx, 4)
-    incl %eax
-    decl %ecx
+    mov (%esi, %ebx, 4), %edx
+    add $1, %edx
+    mov %edx, (%esi, %ebx, 4)
+    inc %eax
+    dec %ecx
     jmp et_tablou_frecv
 
 et_parcurgere:
-    movl $0, %eax
-    movl $0, %ebx
-    movl $0, %edx
+    mov $0, %eax
+    mov $0, %ebx
+    mov $0, %edx
     lea frecv, %esi
 
 et_cautare:
     cmp $100, %eax
     jg afisare
-    movl (%esi, %eax, 4), %ecx
+    mov (%esi, %eax, 4), %ecx
     cmp %edx, %ecx
     jle et_cont_parcurgere
-    movl %ecx, %edx
-    movl %eax, %ebx
+    mov %ecx, %edx
+    mov %eax, %ebx
 
 et_cont_parcurgere:
-    incl %eax
+    inc %eax
     jmp et_cautare
 
 afisare:
-    pushl %ebx
-    pushl $formatAfisare
+    push %ebx
+    push $formatAfisare
     call printf
-    addl $8, %esp
+    add $8, %esp
 
 et_exit:
-    movl $1, %eax
-    xorl %ebx, %ebx
+    mov $1, %eax
+    xor %ebx, %ebx
     int $0x80
