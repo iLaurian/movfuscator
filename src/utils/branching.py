@@ -223,7 +223,7 @@ class BranchingFuscator:
     match instruction.mnemonic:
       # Jumps using EFLAGS
       case "jnc":
-        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, False   )
+        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, False)
       case "jc":
         self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, True)
       case "jns":
@@ -259,14 +259,14 @@ class BranchingFuscator:
       ## Unsigned inequalities
       case "jb":
         # CF == 1 (so same as jc)
-        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, False)
+        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, True)
       case "jbe":
         self.translate_jbe(instruction) # CF == 1 or ZF == 1
       case "ja":
         self.translate_ja(instruction)  # CF == 0 and ZF == 0
       case "jae":
         # CF == 0 (so same as jnc)
-        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, True)
+        self.translate_flag_jmp(instruction, Labels.FLAG_CARRY, False)
 
       case "cmp":
         self.translate_cmp(instruction)
