@@ -455,46 +455,35 @@ def translate_alu_instruction(opcode, operands):
             mov("%edx", dval)
 
     def impl_inc_helper(dest_op):
-        # INC = ADD dest, 1 (But CF is preserved)
         emit("# -- alu_inc --")
 
-        # 1. Backup CF (INC should not change it)
-        # We use b0 as temp storage for CF
         mov("$0", "%eax")
         movb("cf", "%al")
         movb("%al", "b0")
 
-        # 2. Perform ADD
         load_to_scratch(dest_op, "alu_y")  # Dest
         mov("$1", "alu_x")  # Source = 1
 
-        # alu_s = alu_y + alu_x
         impl_alu_add32("alu_s", "alu_y", "alu_x")
         write_back("alu_s", dest_op)
 
-        # 3. Restore CF
         mov("$0", "%eax")
         movb("b0", "%al")
         movb("%al", "cf")
 
     def impl_dec_helper(dest_op):
-        # DEC = SUB dest, 1 (But CF is preserved)
         emit("# -- alu_dec --")
 
-        # 1. Backup CF
         mov("$0", "%eax")
         movb("cf", "%al")
         movb("%al", "b0")
 
-        # 2. Perform SUB
-        load_to_scratch(dest_op, "alu_x")  # Dest
-        mov("$1", "alu_y")  # Source = 1
+        load_to_scratch(dest_op, "alu_x")
+        mov("$1", "alu_y")
 
-        # alu_s = alu_x - alu_y
         impl_alu_sub32("alu_s", "alu_x", "alu_y")
         write_back("alu_s", dest_op)
 
-        # 3. Restore CF
         mov("$0", "%eax")
         movb("b0", "%al")
         movb("%al", "cf")
