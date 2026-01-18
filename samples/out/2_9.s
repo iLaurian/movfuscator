@@ -134705,12 +134705,12 @@ alu_cmp_of_01:  .long alu_cmp_of_010, alu_cmp_of_011
 alu_cmp_of_10:  .long alu_cmp_of_100, alu_cmp_of_101
 alu_cmp_of_11:  .long alu_cmp_of_110, alu_cmp_of_111
 alu_cmp_of_000: .long 0
-alu_cmp_of_001: .long 0
+alu_cmp_of_001: .long 1
 alu_cmp_of_010: .long 0
-alu_cmp_of_011: .long 1
-alu_cmp_of_100: .long 1
+alu_cmp_of_011: .long 0
+alu_cmp_of_100: .long 0
 alu_cmp_of_101: .long 0
-alu_cmp_of_110: .long 0
+alu_cmp_of_110: .long 1
 alu_cmp_of_111: .long 0
 .align 16
 .globl b0, b1, b2, b3
@@ -135071,10 +135071,10 @@ movl %edx, backup_edx
 movl %esi, backup_esi
 movl %edi, backup_edi
 	# -- alu_inc --
+movl %ecx, alu_y
 movl $0, %eax
 movb cf, %al
 movb %al, b0
-movl %ecx, alu_y
 movl $1, alu_x
 	# -- alu_add32 alu_s = alu_y + alu_x --
 movl $0, %eax
@@ -135141,10 +135141,10 @@ movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl (%edx), %eax
 movb %al, of
-movl alu_s, %ecx
 movl $0, %eax
 movb b0, %al
 movb %al, cf
+movl alu_s, %ecx
 	# -- context restore --
 movl backup_eax, %eax
 movl backup_ebx, %ebx
@@ -135236,7 +135236,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -135376,10 +135376,10 @@ movl %edx, backup_edx
 movl %esi, backup_esi
 movl %edi, backup_edi
 	# -- alu_dec --
+movl %edx, alu_x
 movl $0, %eax
 movb cf, %al
 movb %al, b0
-movl %edx, alu_x
 movl $1, alu_y
 	# -- alu_sub32 alu_s = alu_x - alu_y --
 movl $0, %eax
@@ -135457,7 +135457,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -135466,10 +135466,10 @@ movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl (%edx), %eax
 movb %al, of
-movl alu_s, %edx
 movl $0, %eax
 movb b0, %al
 movb %al, cf
+movl alu_s, %edx
 	# -- context restore --
 movl backup_eax, %eax
 movl backup_ebx, %ebx

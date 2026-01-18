@@ -134705,12 +134705,12 @@ alu_cmp_of_01:  .long alu_cmp_of_010, alu_cmp_of_011
 alu_cmp_of_10:  .long alu_cmp_of_100, alu_cmp_of_101
 alu_cmp_of_11:  .long alu_cmp_of_110, alu_cmp_of_111
 alu_cmp_of_000: .long 0
-alu_cmp_of_001: .long 0
+alu_cmp_of_001: .long 1
 alu_cmp_of_010: .long 0
-alu_cmp_of_011: .long 1
-alu_cmp_of_100: .long 1
+alu_cmp_of_011: .long 0
+alu_cmp_of_100: .long 0
 alu_cmp_of_101: .long 0
-alu_cmp_of_110: .long 0
+alu_cmp_of_110: .long 1
 alu_cmp_of_111: .long 0
 .align 16
 .globl b0, b1, b2, b3
@@ -134917,7 +134917,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -135157,7 +135157,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -135255,7 +135255,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -135399,7 +135399,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -135497,7 +135497,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -135641,7 +135641,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -135739,7 +135739,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -135883,7 +135883,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -135981,7 +135981,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -136125,7 +136125,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -136223,7 +136223,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -136367,7 +136367,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -136465,7 +136465,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -136609,7 +136609,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -136707,7 +136707,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -136851,7 +136851,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -136949,7 +136949,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -137093,7 +137093,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -137191,7 +137191,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -137335,7 +137335,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -137433,7 +137433,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -137577,7 +137577,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -137675,7 +137675,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -137819,7 +137819,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -137917,7 +137917,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -138061,7 +138061,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -138159,7 +138159,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -138303,7 +138303,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -138401,7 +138401,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -138545,7 +138545,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -138643,7 +138643,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -138787,7 +138787,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -138885,7 +138885,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -139029,7 +139029,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -139127,7 +139127,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -139271,7 +139271,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -139369,7 +139369,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -139513,7 +139513,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -139611,7 +139611,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -139755,7 +139755,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -139853,7 +139853,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -139997,7 +139997,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -140095,7 +140095,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -140239,7 +140239,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -140337,7 +140337,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -140481,7 +140481,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -140579,7 +140579,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -140723,7 +140723,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -140821,7 +140821,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -140965,7 +140965,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -141063,7 +141063,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -141207,7 +141207,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -141305,7 +141305,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -141449,7 +141449,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -141547,7 +141547,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -141691,7 +141691,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -141789,7 +141789,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -141933,7 +141933,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -142031,7 +142031,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -142175,7 +142175,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -142273,7 +142273,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -142417,7 +142417,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -142515,7 +142515,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -142659,7 +142659,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
@@ -142757,7 +142757,7 @@ movb alu_x+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax
-movb alu_y+3, %al
+movb alu_z0+3, %al
 movl alu_b7(,%eax,4), %eax
 movl (%edx,%eax,4), %edx
 movl $0, %eax

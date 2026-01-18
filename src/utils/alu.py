@@ -17,9 +17,6 @@ def generate_alu_tables():
     def emit(s):
         lines.append(s)
 
-    def emit_label(l):
-        emit(f"{l}:")
-
     def build_1d_table(name, dtype, elements, expr_lambda):
         emit(f".align 16")
         emit(f".globl {name}")
@@ -180,23 +177,20 @@ def generate_alu_tables():
     emit("alu_cmp_of:     .long alu_cmp_of_0,   alu_cmp_of_1")
     emit("alu_cmp_of_0:   .long alu_cmp_of_00,  alu_cmp_of_01")
     emit("alu_cmp_of_1:   .long alu_cmp_of_10,  alu_cmp_of_11")
-
-    # Level 2
     emit("alu_cmp_of_00:  .long alu_cmp_of_000, alu_cmp_of_001")
     emit("alu_cmp_of_01:  .long alu_cmp_of_010, alu_cmp_of_011")
     emit("alu_cmp_of_10:  .long alu_cmp_of_100, alu_cmp_of_101")
     emit("alu_cmp_of_11:  .long alu_cmp_of_110, alu_cmp_of_111")
 
-    # Leaves (1 = Overflow, 0 = No Overflow)
-    # Mapping: [SignA][SignB][SignDiff]
-    emit("alu_cmp_of_000: .long 0")
-    emit("alu_cmp_of_001: .long 0")
-    emit("alu_cmp_of_010: .long 0")
-    emit("alu_cmp_of_011: .long 1")
-    emit("alu_cmp_of_100: .long 1")
-    emit("alu_cmp_of_101: .long 0")
-    emit("alu_cmp_of_110: .long 0")
-    emit("alu_cmp_of_111: .long 0")
+    # Mapping: [SignA][SignB][SignResult]
+    emit("alu_cmp_of_000: .long 0")  # Pos + Pos = Pos (OK)
+    emit("alu_cmp_of_001: .long 1")  # Pos + Pos = Neg (OVERFLOW) [FIXED]
+    emit("alu_cmp_of_010: .long 0")  # Pos + Neg = Pos (OK)
+    emit("alu_cmp_of_011: .long 0")  # Pos + Neg = Neg (OK)
+    emit("alu_cmp_of_100: .long 0")  # Neg + Pos = Pos (OK)
+    emit("alu_cmp_of_101: .long 0")  # Neg + Pos = Neg (OK)
+    emit("alu_cmp_of_110: .long 1")  # Neg + Neg = Pos (OVERFLOW)
+    emit("alu_cmp_of_111: .long 0")  # Neg + Neg = Neg (OK)
 
     # Boolean scratch
     emit(".align 16")
@@ -457,36 +451,37 @@ def translate_alu_instruction(opcode, operands):
     def impl_inc_helper(dest_op):
         emit("# -- alu_inc --")
 
+        load_to_scratch(dest_op, "alu_y")
         mov("$0", "%eax")
         movb("cf", "%al")
         movb("%al", "b0")
 
-        load_to_scratch(dest_op, "alu_y")  # Dest
-        mov("$1", "alu_x")  # Source = 1
-
+        mov("$1", "alu_x")
         impl_alu_add32("alu_s", "alu_y", "alu_x")
-        write_back("alu_s", dest_op)
 
         mov("$0", "%eax")
         movb("b0", "%al")
         movb("%al", "cf")
+
+        write_back("alu_s", dest_op)
 
     def impl_dec_helper(dest_op):
         emit("# -- alu_dec --")
 
+        load_to_scratch(dest_op, "alu_x")  # Dest = x
+
         mov("$0", "%eax")
         movb("cf", "%al")
         movb("%al", "b0")
 
-        load_to_scratch(dest_op, "alu_x")
         mov("$1", "alu_y")
-
         impl_alu_sub32("alu_s", "alu_x", "alu_y")
-        write_back("alu_s", dest_op)
 
         mov("$0", "%eax")
         movb("b0", "%al")
         movb("%al", "cf")
+
+        write_back("alu_s", dest_op)
 
     def prepare_shift(count_op, dest_op):
         load_to_scratch(dest_op, "alu_x")
@@ -724,7 +719,7 @@ def translate_alu_instruction(opcode, operands):
         movb("%al", "cf")
 
         emit_update_zf_sf(res)
-        emit_update_of(x, y, res)
+        emit_update_of(x, "alu_z0", res)
 
     def impl_bitwise(op_name, table_name, res, x, y):
         emit(f"# -- alu_{op_name} --")

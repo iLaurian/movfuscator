@@ -5,8 +5,10 @@
     - wrote back to register file before updating flags, resulting in garbage in dest_reg
   - 4_2 @done
     - debug message printed in the console
-  - 4_4
-- fix exit code check in test.sh @done
+  - 4_3 @done
+  - 4_4 @done
+    - both had errors due to register clobbering 
+- fix output & exit code check in `test.sh` @done
 
 # 2025-01-11
 
