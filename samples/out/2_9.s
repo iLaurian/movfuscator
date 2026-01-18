@@ -36,9 +36,9 @@
       .text
       # ############################## THE DISPATCHER ##############################
       MVF_DISPATCHER:
-      push $__ARRIVED_AT_DISPATCHER_DEBUG_STR
-      call puts
-      add $4, %esp
+      # push $__ARRIVED_AT_DISPATCHER_DEBUG_STR
+      # call puts
+      # add $4, %esp
 
       # %eax now contains a pointer to a ucontext_t struct
       # which stores the values of all the registers at the moment
@@ -134735,6 +134735,8 @@ alu_s1: .long 0
 alu_s2: .long 0
 .globl alu_s3
 alu_s3: .long 0
+.globl alu_shl_pad
+alu_shl_pad: .long 0
 .globl alu_ss
 alu_ss: .long 0
 .globl alu_sc
@@ -134823,672 +134825,755 @@ backup_edi: .long 0
 .text 
 .global main
 main:
-	mov $0b11011111111110111111, %eax
+mov $0b11011111111110111111, %eax
 	# -- context save --
-	movl %eax, backup_eax
-	movl %ebx, backup_ebx
-	movl %ecx, backup_ecx
-	movl %edx, backup_edx
-	movl %esi, backup_esi
-	movl %edi, backup_edi
-	movl %ebx, alu_x
-	movl %ebx, alu_y
+movl %eax, backup_eax
+movl %ebx, backup_ebx
+movl %ecx, backup_ecx
+movl %edx, backup_edx
+movl %esi, backup_esi
+movl %edi, backup_edi
+movl %ebx, alu_x
+movl %ebx, alu_y
 	# -- alu_xor --
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+0, %al
-	movb alu_y+0, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+0
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+1, %al
-	movb alu_y+1, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+1
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+2, %al
-	movb alu_y+2, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+2
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+3, %al
-	movb alu_y+3, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+3
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+0, %al
+movb alu_y+0, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+0
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+1, %al
+movb alu_y+1, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+1
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+2, %al
+movb alu_y+2, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+2
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+3, %al
+movb alu_y+3, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+3
 	# -- flags (xor) --
-	movb $0, cf
-	movb $0, of
-	movl $0, %eax
-	movb alu_s+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movb %al, sf
-	movl $0, %eax
-	movl $0, %edx
-	movb alu_s+0, %dl
-	movb alu_true(%edx), %al
-	movb alu_s+1, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_s+2, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_s+3, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_false(%eax), %al
-	movb %al, zf
-	movl alu_s, %ebx
+movb $0, cf
+movb $0, of
+movl $0, %eax
+movb alu_s+3, %al
+movl alu_b7(,%eax,4), %eax
+movb %al, sf
+movl $0, %eax
+movl $0, %edx
+movb alu_s+0, %dl
+movb alu_true(%edx), %al
+movb alu_s+1, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_s+2, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_s+3, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_false(%eax), %al
+movb %al, zf
+movl alu_s, %ebx
 	# -- context restore --
-	movl backup_eax, %eax
-	movl backup_ecx, %ecx
-	movl backup_edx, %edx
-	movl backup_esi, %esi
-	movl backup_edi, %edi
+movl backup_eax, %eax
+movl backup_ecx, %ecx
+movl backup_edx, %edx
+movl backup_esi, %esi
+movl backup_edi, %edi
 	# -- context save --
-	movl %eax, backup_eax
-	movl %ebx, backup_ebx
-	movl %ecx, backup_ecx
-	movl %edx, backup_edx
-	movl %esi, backup_esi
-	movl %edi, backup_edi
-	movl %ecx, alu_x
-	movl %ecx, alu_y
+movl %eax, backup_eax
+movl %ebx, backup_ebx
+movl %ecx, backup_ecx
+movl %edx, backup_edx
+movl %esi, backup_esi
+movl %edi, backup_edi
+movl %ecx, alu_x
+movl %ecx, alu_y
 	# -- alu_xor --
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+0, %al
-	movb alu_y+0, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+0
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+1, %al
-	movb alu_y+1, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+1
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+2, %al
-	movb alu_y+2, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+2
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+3, %al
-	movb alu_y+3, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+3
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+0, %al
+movb alu_y+0, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+0
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+1, %al
+movb alu_y+1, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+1
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+2, %al
+movb alu_y+2, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+2
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+3, %al
+movb alu_y+3, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+3
 	# -- flags (xor) --
-	movb $0, cf
-	movb $0, of
-	movl $0, %eax
-	movb alu_s+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movb %al, sf
-	movl $0, %eax
-	movl $0, %edx
-	movb alu_s+0, %dl
-	movb alu_true(%edx), %al
-	movb alu_s+1, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_s+2, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_s+3, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_false(%eax), %al
-	movb %al, zf
-	movl alu_s, %ecx
+movb $0, cf
+movb $0, of
+movl $0, %eax
+movb alu_s+3, %al
+movl alu_b7(,%eax,4), %eax
+movb %al, sf
+movl $0, %eax
+movl $0, %edx
+movb alu_s+0, %dl
+movb alu_true(%edx), %al
+movb alu_s+1, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_s+2, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_s+3, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_false(%eax), %al
+movb %al, zf
+movl alu_s, %ecx
 	# -- context restore --
-	movl backup_eax, %eax
-	movl backup_ebx, %ebx
-	movl backup_edx, %edx
-	movl backup_esi, %esi
-	movl backup_edi, %edi
-	mov $32, %edx
+movl backup_eax, %eax
+movl backup_ebx, %ebx
+movl backup_edx, %edx
+movl backup_esi, %esi
+movl backup_edi, %edi
+mov $32, %edx
 et_loop:
 	# -- context save --
-	movl %eax, backup_eax
-	movl %ebx, backup_ebx
-	movl %ecx, backup_ecx
-	movl %edx, backup_edx
-	movl %esi, backup_esi
-	movl %edi, backup_edi
+movl %eax, backup_eax
+movl %ebx, backup_ebx
+movl %ecx, backup_ecx
+movl %edx, backup_edx
+movl %esi, backup_esi
+movl %edi, backup_edi
 	# push
-	movl %eax, stack_temp
-	movl sp, %eax
-	movl push(%eax), %eax
-	movl %eax, sp
-	movl %eax, %esp
-	movl stack_temp, %edx
-	movl %edx, (%eax)
-	movl $1, alu_x
-	movl %eax, alu_y
+movl %eax, stack_temp
+movl sp, %eax
+movl push(%eax), %eax
+movl %eax, sp
+movl %eax, %esp
+movl stack_temp, %edx
+movl %edx, (%eax)
+movl $1, alu_x
+movl %eax, alu_y
 	# -- alu_and --
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+0, %al
-	movb alu_y+0, %bl
-	movl alu_band8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+0
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+1, %al
-	movb alu_y+1, %bl
-	movl alu_band8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+1
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+2, %al
-	movb alu_y+2, %bl
-	movl alu_band8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+2
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+3, %al
-	movb alu_y+3, %bl
-	movl alu_band8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+3
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+0, %al
+movb alu_y+0, %bl
+movl alu_band8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+0
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+1, %al
+movb alu_y+1, %bl
+movl alu_band8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+1
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+2, %al
+movb alu_y+2, %bl
+movl alu_band8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+2
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+3, %al
+movb alu_y+3, %bl
+movl alu_band8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+3
 	# -- flags (and) --
-	movb $0, cf
-	movb $0, of
-	movl $0, %eax
-	movb alu_s+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movb %al, sf
-	movl $0, %eax
-	movl $0, %edx
-	movb alu_s+0, %dl
-	movb alu_true(%edx), %al
-	movb alu_s+1, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_s+2, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_s+3, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_false(%eax), %al
-	movb %al, zf
+movb $0, cf
+movb $0, of
+movl $0, %eax
+movb alu_s+3, %al
+movl alu_b7(,%eax,4), %eax
+movb %al, sf
+movl $0, %eax
+movl $0, %edx
+movb alu_s+0, %dl
+movb alu_true(%edx), %al
+movb alu_s+1, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_s+2, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_s+3, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_false(%eax), %al
+movb %al, zf
 	# pop
-	movl sp, %eax
-	movl (%eax), %edx
-	movl %edx, stack_temp
-	movl pop(%eax), %eax
-	movl %eax, sp
-	movl %eax, %esp
-	movl stack_temp, %eax
+movl sp, %eax
+movl (%eax), %edx
+movl %edx, stack_temp
+movl pop(%eax), %eax
+movl %eax, sp
+movl %eax, %esp
+movl stack_temp, %eax
 	# -- context restore --
-	movl backup_eax, %eax
-	movl backup_ebx, %ebx
-	movl backup_ecx, %ecx
-	movl backup_edx, %edx
-	movl backup_esi, %esi
-	movl backup_edi, %edi
-	jz et_zero
+movl backup_eax, %eax
+movl backup_ebx, %ebx
+movl backup_ecx, %ecx
+movl backup_edx, %edx
+movl backup_esi, %esi
+movl backup_edi, %edi
+
+      # ### BEGIN TRANSLATION FOR: jz et_zero ###
+      mov %eax, MVF_REGISTER_EAX
+      mov %edi, MVF_REGISTER_EDI
+      
+      mov $0, %eax
+      mov zf, %al
+      
+      mov $MVF_CONDITIONAL_JUMP_LUT, %edi
+      mov 4(%edi, %eax, 4), %edi
+      mov MVF_REGISTER_EAX, %eax
+      
+      movl $et_zero, MVF_DISPATCHER_JUMP_ADDRESS
+      movl $0xDEAD, (%edi)
+      
+      mov MVF_REGISTER_EDI, %edi
+      # ###  END TRANSLATION FOR: jz et_zero  ###
+    
 	# -- context save --
-	movl %eax, backup_eax
-	movl %ebx, backup_ebx
-	movl %ecx, backup_ecx
-	movl %edx, backup_edx
-	movl %esi, backup_esi
-	movl %edi, backup_edi
+movl %eax, backup_eax
+movl %ebx, backup_ebx
+movl %ecx, backup_ecx
+movl %edx, backup_edx
+movl %esi, backup_esi
+movl %edi, backup_edi
 	# -- alu_inc --
-	movl $0, %eax
-	movb cf, %al
-	movb %al, b0
-	movl %ecx, alu_y
-	movl $1, alu_x
+movl $0, %eax
+movb cf, %al
+movb %al, b0
+movl %ecx, alu_y
+movl $1, alu_x
 	# -- alu_add32 alu_s = alu_y + alu_x --
-	movl $0, %eax
-	movl $0, %ecx
-	movw alu_y+0, %ax
-	movw alu_x+0, %cx
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movw %dx, alu_s+0
-	movl %edx, alu_t
-	movl $0, %eax
-	movw alu_y+2, %ax
-	movl $0, %ecx
-	movw alu_x+2, %cx
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movl %edx, %eax
-	movl $0, %ecx
-	movb alu_t+2, %cl
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movw %dx, alu_s+2
-	movl %edx, alu_t
+movl $0, %eax
+movl $0, %ecx
+movw alu_y+0, %ax
+movw alu_x+0, %cx
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movw %dx, alu_s+0
+movl %edx, alu_t
+movl $0, %eax
+movw alu_y+2, %ax
+movl $0, %ecx
+movw alu_x+2, %cx
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movl %edx, %eax
+movl $0, %ecx
+movb alu_t+2, %cl
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movw %dx, alu_s+2
+movl %edx, alu_t
 	# -- flags (ADD) --
-	movl $0, %eax
-	movb alu_t+2, %al
-	movb %al, cf
+movl $0, %eax
+movb alu_t+2, %al
+movb %al, cf
 	# -- update ZF SF (alu_s) --
-	movl $0, %eax
-	movb alu_s+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movb %al, sf
-	movl $0, %ebx
-	movl $0, %eax
-	movb alu_s+0, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+1, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+2, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+3, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movl $0, %eax
-	movb %bl, %al
-	movb alu_false(%eax), %al
-	movb %al, zf
+movl $0, %eax
+movb alu_s+3, %al
+movl alu_b7(,%eax,4), %eax
+movb %al, sf
+movl $0, %ebx
+movl $0, %eax
+movb alu_s+0, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+1, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+2, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+3, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movl $0, %eax
+movb %bl, %al
+movb alu_false(%eax), %al
+movb %al, zf
 	# -- update OF --
-	movl $alu_cmp_of, %edx
-	movl $0, %eax
-	movb alu_y+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movl (%edx,%eax,4), %edx
-	movl $0, %eax
-	movb alu_x+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movl (%edx,%eax,4), %edx
-	movl $0, %eax
-	movb alu_s+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movl (%edx,%eax,4), %edx
-	movl (%edx), %eax
-	movb %al, of
-	movl alu_s, %ecx
-	movl $0, %eax
-	movb b0, %al
-	movb %al, cf
+movl $alu_cmp_of, %edx
+movl $0, %eax
+movb alu_y+3, %al
+movl alu_b7(,%eax,4), %eax
+movl (%edx,%eax,4), %edx
+movl $0, %eax
+movb alu_x+3, %al
+movl alu_b7(,%eax,4), %eax
+movl (%edx,%eax,4), %edx
+movl $0, %eax
+movb alu_s+3, %al
+movl alu_b7(,%eax,4), %eax
+movl (%edx,%eax,4), %edx
+movl (%edx), %eax
+movb %al, of
+movl alu_s, %ecx
+movl $0, %eax
+movb b0, %al
+movb %al, cf
 	# -- context restore --
-	movl backup_eax, %eax
-	movl backup_ebx, %ebx
-	movl backup_edx, %edx
-	movl backup_esi, %esi
-	movl backup_edi, %edi
+movl backup_eax, %eax
+movl backup_ebx, %ebx
+movl backup_edx, %edx
+movl backup_esi, %esi
+movl backup_edi, %edi
 	# -- context save --
-	movl %eax, backup_eax
-	movl %ebx, backup_ebx
-	movl %ecx, backup_ecx
-	movl %edx, backup_edx
-	movl %esi, backup_esi
-	movl %edi, backup_edi
-	movl %ebx, alu_y
-	movl %ecx, alu_x
+movl %eax, backup_eax
+movl %ebx, backup_ebx
+movl %ecx, backup_ecx
+movl %edx, backup_edx
+movl %esi, backup_esi
+movl %edi, backup_edi
+movl %ebx, alu_y
+movl %ecx, alu_x
 	# -- alu_sub32 alu_s = alu_x - alu_y --
-	movl $0, %eax
-	movb alu_y+0, %al
-	movb alu_inv8(%eax), %dl
-	movb %dl, alu_z0+0
-	movl $0, %eax
-	movb alu_y+1, %al
-	movb alu_inv8(%eax), %dl
-	movb %dl, alu_z0+1
-	movl $0, %eax
-	movb alu_y+2, %al
-	movb alu_inv8(%eax), %dl
-	movb %dl, alu_z0+2
-	movl $0, %eax
-	movb alu_y+3, %al
-	movb alu_inv8(%eax), %dl
-	movb %dl, alu_z0+3
-	movl $0, %eax
-	movl $0, %ecx
-	movw alu_x+0, %ax
-	movw alu_z0+0, %cx
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movl $1, %ecx
-	movl alu_add16(,%edx,4), %eax
-	movl (%eax,%ecx,4), %edx
-	movw %dx, alu_s+0
-	movl %edx, alu_t
-	movl $0, %eax
-	movw alu_x+2, %ax
-	movl $0, %ecx
-	movw alu_z0+2, %cx
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movl %edx, %eax
-	movl $0, %ecx
-	movb alu_t+2, %cl
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movw %dx, alu_s+2
-	movl %edx, alu_t
+movl $0, %eax
+movb alu_y+0, %al
+movb alu_inv8(%eax), %dl
+movb %dl, alu_z0+0
+movl $0, %eax
+movb alu_y+1, %al
+movb alu_inv8(%eax), %dl
+movb %dl, alu_z0+1
+movl $0, %eax
+movb alu_y+2, %al
+movb alu_inv8(%eax), %dl
+movb %dl, alu_z0+2
+movl $0, %eax
+movb alu_y+3, %al
+movb alu_inv8(%eax), %dl
+movb %dl, alu_z0+3
+movl $0, %eax
+movl $0, %ecx
+movw alu_x+0, %ax
+movw alu_z0+0, %cx
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movl $1, %ecx
+movl alu_add16(,%edx,4), %eax
+movl (%eax,%ecx,4), %edx
+movw %dx, alu_s+0
+movl %edx, alu_t
+movl $0, %eax
+movw alu_x+2, %ax
+movl $0, %ecx
+movw alu_z0+2, %cx
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movl %edx, %eax
+movl $0, %ecx
+movb alu_t+2, %cl
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movw %dx, alu_s+2
+movl %edx, alu_t
 	# -- flags (SUB/CMP) --
-	movl $0, %eax
-	movb alu_t+2, %al
-	movb alu_false(%eax), %al
-	movb %al, cf
+movl $0, %eax
+movb alu_t+2, %al
+movb alu_false(%eax), %al
+movb %al, cf
 	# -- update ZF SF (alu_s) --
-	movl $0, %eax
-	movb alu_s+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movb %al, sf
-	movl $0, %ebx
-	movl $0, %eax
-	movb alu_s+0, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+1, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+2, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+3, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movl $0, %eax
-	movb %bl, %al
-	movb alu_false(%eax), %al
-	movb %al, zf
+movl $0, %eax
+movb alu_s+3, %al
+movl alu_b7(,%eax,4), %eax
+movb %al, sf
+movl $0, %ebx
+movl $0, %eax
+movb alu_s+0, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+1, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+2, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+3, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movl $0, %eax
+movb %bl, %al
+movb alu_false(%eax), %al
+movb %al, zf
 	# -- update OF --
-	movl $alu_cmp_of, %edx
-	movl $0, %eax
-	movb alu_x+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movl (%edx,%eax,4), %edx
-	movl $0, %eax
-	movb alu_y+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movl (%edx,%eax,4), %edx
-	movl $0, %eax
-	movb alu_s+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movl (%edx,%eax,4), %edx
-	movl (%edx), %eax
-	movb %al, of
+movl $alu_cmp_of, %edx
+movl $0, %eax
+movb alu_x+3, %al
+movl alu_b7(,%eax,4), %eax
+movl (%edx,%eax,4), %edx
+movl $0, %eax
+movb alu_y+3, %al
+movl alu_b7(,%eax,4), %eax
+movl (%edx,%eax,4), %edx
+movl $0, %eax
+movb alu_s+3, %al
+movl alu_b7(,%eax,4), %eax
+movl (%edx,%eax,4), %edx
+movl (%edx), %eax
+movb %al, of
 	# -- context restore --
-	movl backup_eax, %eax
-	movl backup_ebx, %ebx
-	movl backup_ecx, %ecx
-	movl backup_edx, %edx
-	movl backup_esi, %esi
-	movl backup_edi, %edi
-	jle et_next
-	mov %ecx, %ebx
+movl backup_eax, %eax
+movl backup_ebx, %ebx
+movl backup_ecx, %ecx
+movl backup_edx, %edx
+movl backup_esi, %esi
+movl backup_edi, %edi
+
+      # ### BEGIN TRANSLATION FOR: jle et_next ###
+      mov %eax, MVF_REGISTER_EAX
+      mov %ebx, MVF_REGISTER_EBX
+      mov %ecx, MVF_REGISTER_ECX
+      mov %edi, MVF_REGISTER_EDI
+
+      # %eax = (ZF == 1) = (ZF & 1)
+      mov $0, %ecx
+      movb zf, %cl
+      mov $MVF_1BIT_AND_1_LUT, %ebx
+      mov (%ebx, %ecx, 4), %eax
+
+      # %eax: stores the address for the OR LUT 
+      # based on the previous value of (ZF == 1)
+      mov $MVF_1BIT_OR_LUT, %ebx
+      mov (%ebx, %eax, 4), %eax
+
+      # %ecx = (SF != OF) = (SF ^ OF)
+      mov $0, %ecx
+      movb sf, %cl
+      mov $MVF_1BIT_XOR_LUT, %ebx
+      mov (%ebx, %ecx, 4), %ebx
+      mov $0, %ecx
+      movb of, %cl
+      mov (%ebx, %ecx, 4), %ecx
+
+      # %eax = (ZF == 1) OR (SF != OF)
+      mov (%eax, %ecx, 4), %eax
+
+      # Preparing the jump via the dispatcher
+      movl $et_next, MVF_DISPATCHER_JUMP_ADDRESS
+      mov $MVF_CONDITIONAL_JUMP_LUT, %ebx
+      mov 4(%ebx, %eax, 4), %edi
+      mov MVF_REGISTER_EAX, %eax
+      mov MVF_REGISTER_EBX, %ebx
+      mov MVF_REGISTER_ECX, %ecx
+
+      movl $0xB00B5, (%edi)
+      mov MVF_REGISTER_EDI, %edi
+      # ###  END TRANSLATION FOR: jle et_next  ###
+    
+mov %ecx, %ebx
 et_next:
 	# -- context save --
-	movl %eax, backup_eax
-	movl %ebx, backup_ebx
-	movl %ecx, backup_ecx
-	movl %edx, backup_edx
-	movl %esi, backup_esi
-	movl %edi, backup_edi
+movl %eax, backup_eax
+movl %ebx, backup_ebx
+movl %ecx, backup_ecx
+movl %edx, backup_edx
+movl %esi, backup_esi
+movl %edi, backup_edi
 	# -- alu_shr --
-	movl $1, alu_x
-	movl %eax, alu_y
-	movl alu_x, %eax
-	movl alu_clamp32(,%eax,4), %eax
-	movl %eax, alu_x
-	movl $0, alu_s0
-	movl $0, alu_s1
-	movl $0, alu_s2
-	movl $0, alu_s3
-	movl $0, alu_ss
-	movl alu_x, %eax
-	movl alu_rshu8(,%eax,4), %edx
-	movl $0, %eax
-	movb alu_y+0, %al
-	movl (%edx,%eax,4), %ecx
-	movl %ecx, alu_s0-3
-	movl $0, %eax
-	movb alu_y+1, %al
-	movl (%edx,%eax,4), %ecx
-	movl %ecx, alu_s1-2
-	movl $0, %eax
-	movb alu_y+2, %al
-	movl (%edx,%eax,4), %ecx
-	movl %ecx, alu_s2-1
-	movl $0, %eax
-	movb alu_y+3, %al
-	movl (%edx,%eax,4), %ecx
-	movl %ecx, alu_s3
-	movl alu_s0, %eax
-	or alu_s1, %eax
-	or alu_s2, %eax
-	or alu_s3, %eax
-	or alu_ss, %eax
-	movl %eax, alu_s
-	movl alu_s, %eax
+movl %eax, alu_x
+movl $1, alu_y
+movl alu_y, %eax
+movl alu_clamp32(,%eax,4), %eax
+movl %eax, alu_y
+movl $0, alu_s0
+movl $0, alu_s1
+movl $0, alu_s2
+movl $0, alu_s3
+movl $0, alu_ss
+movl alu_y, %eax
+movl alu_rshu8(,%eax,4), %edx
+movl $0, %eax
+movb alu_x+0, %al
+movl (%edx,%eax,4), %ecx
+movl %ecx, alu_s0-3
+movl $0, %eax
+movb alu_x+1, %al
+movl (%edx,%eax,4), %ecx
+movl %ecx, alu_s1-2
+movl $0, %eax
+movb alu_x+2, %al
+movl (%edx,%eax,4), %ecx
+movl %ecx, alu_s2-1
+movl $0, %eax
+movb alu_x+3, %al
+movl (%edx,%eax,4), %ecx
+movl %ecx, alu_s3
+movl alu_s0, %eax
+or alu_s1, %eax
+or alu_s2, %eax
+or alu_s3, %eax
+or alu_ss, %eax
+movl %eax, alu_s
 	# -- update ZF SF (alu_s) --
-	movl $0, %eax
-	movb alu_s+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movb %al, sf
-	movl $0, %ebx
-	movl $0, %eax
-	movb alu_s+0, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+1, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+2, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+3, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movl $0, %eax
-	movb %bl, %al
-	movb alu_false(%eax), %al
-	movb %al, zf
+movl $0, %eax
+movb alu_s+3, %al
+movl alu_b7(,%eax,4), %eax
+movb %al, sf
+movl $0, %ebx
+movl $0, %eax
+movb alu_s+0, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+1, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+2, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+3, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movl $0, %eax
+movb %bl, %al
+movb alu_false(%eax), %al
+movb %al, zf
+movl alu_s, %eax
 	# -- context restore --
-	movl backup_ebx, %ebx
-	movl backup_ecx, %ecx
-	movl backup_edx, %edx
-	movl backup_esi, %esi
-	movl backup_edi, %edi
+movl backup_ebx, %ebx
+movl backup_ecx, %ecx
+movl backup_edx, %edx
+movl backup_esi, %esi
+movl backup_edi, %edi
 	# -- context save --
-	movl %eax, backup_eax
-	movl %ebx, backup_ebx
-	movl %ecx, backup_ecx
-	movl %edx, backup_edx
-	movl %esi, backup_esi
-	movl %edi, backup_edi
+movl %eax, backup_eax
+movl %ebx, backup_ebx
+movl %ecx, backup_ecx
+movl %edx, backup_edx
+movl %esi, backup_esi
+movl %edi, backup_edi
 	# -- alu_dec --
-	movl $0, %eax
-	movb cf, %al
-	movb %al, b0
-	movl %edx, alu_x
-	movl $1, alu_y
+movl $0, %eax
+movb cf, %al
+movb %al, b0
+movl %edx, alu_x
+movl $1, alu_y
 	# -- alu_sub32 alu_s = alu_x - alu_y --
-	movl $0, %eax
-	movb alu_y+0, %al
-	movb alu_inv8(%eax), %dl
-	movb %dl, alu_z0+0
-	movl $0, %eax
-	movb alu_y+1, %al
-	movb alu_inv8(%eax), %dl
-	movb %dl, alu_z0+1
-	movl $0, %eax
-	movb alu_y+2, %al
-	movb alu_inv8(%eax), %dl
-	movb %dl, alu_z0+2
-	movl $0, %eax
-	movb alu_y+3, %al
-	movb alu_inv8(%eax), %dl
-	movb %dl, alu_z0+3
-	movl $0, %eax
-	movl $0, %ecx
-	movw alu_x+0, %ax
-	movw alu_z0+0, %cx
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movl $1, %ecx
-	movl alu_add16(,%edx,4), %eax
-	movl (%eax,%ecx,4), %edx
-	movw %dx, alu_s+0
-	movl %edx, alu_t
-	movl $0, %eax
-	movw alu_x+2, %ax
-	movl $0, %ecx
-	movw alu_z0+2, %cx
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movl %edx, %eax
-	movl $0, %ecx
-	movb alu_t+2, %cl
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movw %dx, alu_s+2
-	movl %edx, alu_t
+movl $0, %eax
+movb alu_y+0, %al
+movb alu_inv8(%eax), %dl
+movb %dl, alu_z0+0
+movl $0, %eax
+movb alu_y+1, %al
+movb alu_inv8(%eax), %dl
+movb %dl, alu_z0+1
+movl $0, %eax
+movb alu_y+2, %al
+movb alu_inv8(%eax), %dl
+movb %dl, alu_z0+2
+movl $0, %eax
+movb alu_y+3, %al
+movb alu_inv8(%eax), %dl
+movb %dl, alu_z0+3
+movl $0, %eax
+movl $0, %ecx
+movw alu_x+0, %ax
+movw alu_z0+0, %cx
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movl $1, %ecx
+movl alu_add16(,%edx,4), %eax
+movl (%eax,%ecx,4), %edx
+movw %dx, alu_s+0
+movl %edx, alu_t
+movl $0, %eax
+movw alu_x+2, %ax
+movl $0, %ecx
+movw alu_z0+2, %cx
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movl %edx, %eax
+movl $0, %ecx
+movb alu_t+2, %cl
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movw %dx, alu_s+2
+movl %edx, alu_t
 	# -- flags (SUB/CMP) --
-	movl $0, %eax
-	movb alu_t+2, %al
-	movb alu_false(%eax), %al
-	movb %al, cf
+movl $0, %eax
+movb alu_t+2, %al
+movb alu_false(%eax), %al
+movb %al, cf
 	# -- update ZF SF (alu_s) --
-	movl $0, %eax
-	movb alu_s+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movb %al, sf
-	movl $0, %ebx
-	movl $0, %eax
-	movb alu_s+0, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+1, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+2, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movb alu_s+3, %al
-	movb alu_true(%eax), %cl
-	or %cl, %bl
-	movl $0, %eax
-	movb %bl, %al
-	movb alu_false(%eax), %al
-	movb %al, zf
+movl $0, %eax
+movb alu_s+3, %al
+movl alu_b7(,%eax,4), %eax
+movb %al, sf
+movl $0, %ebx
+movl $0, %eax
+movb alu_s+0, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+1, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+2, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movb alu_s+3, %al
+movb alu_true(%eax), %cl
+or %cl, %bl
+movl $0, %eax
+movb %bl, %al
+movb alu_false(%eax), %al
+movb %al, zf
 	# -- update OF --
-	movl $alu_cmp_of, %edx
-	movl $0, %eax
-	movb alu_x+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movl (%edx,%eax,4), %edx
-	movl $0, %eax
-	movb alu_y+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movl (%edx,%eax,4), %edx
-	movl $0, %eax
-	movb alu_s+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movl (%edx,%eax,4), %edx
-	movl (%edx), %eax
-	movb %al, of
-	movl alu_s, %edx
-	movl $0, %eax
-	movb b0, %al
-	movb %al, cf
+movl $alu_cmp_of, %edx
+movl $0, %eax
+movb alu_x+3, %al
+movl alu_b7(,%eax,4), %eax
+movl (%edx,%eax,4), %edx
+movl $0, %eax
+movb alu_y+3, %al
+movl alu_b7(,%eax,4), %eax
+movl (%edx,%eax,4), %edx
+movl $0, %eax
+movb alu_s+3, %al
+movl alu_b7(,%eax,4), %eax
+movl (%edx,%eax,4), %edx
+movl (%edx), %eax
+movb %al, of
+movl alu_s, %edx
+movl $0, %eax
+movb b0, %al
+movb %al, cf
 	# -- context restore --
-	movl backup_eax, %eax
-	movl backup_ebx, %ebx
-	movl backup_ecx, %ecx
-	movl backup_esi, %esi
-	movl backup_edi, %edi
-	jnz et_loop
-	jmp et_exit
+movl backup_eax, %eax
+movl backup_ebx, %ebx
+movl backup_ecx, %ecx
+movl backup_esi, %esi
+movl backup_edi, %edi
+
+      # ### BEGIN TRANSLATION FOR: jnz et_loop ###
+      mov %eax, MVF_REGISTER_EAX
+      mov %edi, MVF_REGISTER_EDI
+      
+      mov $0, %eax
+      mov zf, %al
+      
+      mov $MVF_CONDITIONAL_JUMP_LUT, %edi
+      mov 0(%edi, %eax, 4), %edi
+      mov MVF_REGISTER_EAX, %eax
+      
+      movl $et_loop, MVF_DISPATCHER_JUMP_ADDRESS
+      movl $0xDEAD, (%edi)
+      
+      mov MVF_REGISTER_EDI, %edi
+      # ###  END TRANSLATION FOR: jnz et_loop  ###
+    
+
+      movl $et_exit, MVF_DISPATCHER_JUMP_ADDRESS
+      mov %edi, MVF_REGISTER_EDI
+      movl $0xDEAD, 0
+    
 et_zero:
 	# -- context save --
-	movl %eax, backup_eax
-	movl %ebx, backup_ebx
-	movl %ecx, backup_ecx
-	movl %edx, backup_edx
-	movl %esi, backup_esi
-	movl %edi, backup_edi
-	movl %ecx, alu_x
-	movl %ecx, alu_y
+movl %eax, backup_eax
+movl %ebx, backup_ebx
+movl %ecx, backup_ecx
+movl %edx, backup_edx
+movl %esi, backup_esi
+movl %edi, backup_edi
+movl %ecx, alu_x
+movl %ecx, alu_y
 	# -- alu_xor --
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+0, %al
-	movb alu_y+0, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+0
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+1, %al
-	movb alu_y+1, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+1
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+2, %al
-	movb alu_y+2, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+2
-	movl $0, %eax
-	movl $0, %ebx
-	movb alu_x+3, %al
-	movb alu_y+3, %bl
-	movl alu_bxor8(,%eax,4), %ecx
-	movb (%ecx,%ebx), %dl
-	movb %dl, alu_s+3
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+0, %al
+movb alu_y+0, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+0
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+1, %al
+movb alu_y+1, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+1
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+2, %al
+movb alu_y+2, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+2
+movl $0, %eax
+movl $0, %ebx
+movb alu_x+3, %al
+movb alu_y+3, %bl
+movl alu_bxor8(,%eax,4), %ecx
+movb (%ecx,%ebx), %dl
+movb %dl, alu_s+3
 	# -- flags (xor) --
-	movb $0, cf
-	movb $0, of
-	movl $0, %eax
-	movb alu_s+3, %al
-	movl alu_b7(,%eax,4), %eax
-	movb %al, sf
-	movl $0, %eax
-	movl $0, %edx
-	movb alu_s+0, %dl
-	movb alu_true(%edx), %al
-	movb alu_s+1, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_s+2, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_s+3, %dl
-	movb alu_true(%edx), %dl
-	or %dl, %al
-	movb alu_false(%eax), %al
-	movb %al, zf
-	movl alu_s, %ecx
+movb $0, cf
+movb $0, of
+movl $0, %eax
+movb alu_s+3, %al
+movl alu_b7(,%eax,4), %eax
+movb %al, sf
+movl $0, %eax
+movl $0, %edx
+movb alu_s+0, %dl
+movb alu_true(%edx), %al
+movb alu_s+1, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_s+2, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_s+3, %dl
+movb alu_true(%edx), %dl
+or %dl, %al
+movb alu_false(%eax), %al
+movb %al, zf
+movl alu_s, %ecx
 	# -- context restore --
-	movl backup_eax, %eax
-	movl backup_ebx, %ebx
-	movl backup_edx, %edx
-	movl backup_esi, %esi
-	movl backup_edi, %edi
-	jmp et_next
+movl backup_eax, %eax
+movl backup_ebx, %ebx
+movl backup_edx, %edx
+movl backup_esi, %esi
+movl backup_edi, %edi
+
+      movl $et_next, MVF_DISPATCHER_JUMP_ADDRESS
+      mov %edi, MVF_REGISTER_EDI
+      movl $0xDEAD, 0
+    
 et_exit:
-	mov %ebx, %eax
-	mov $1, %ebx
-	mov $1, %eax
-	int $0x80
+mov %ebx, %eax
+mov $1, %ebx
+mov $1, %eax
+int $0x80

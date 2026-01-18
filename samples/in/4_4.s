@@ -7,6 +7,7 @@
 .text
 .global main
 .extern printf
+.extern fflush
 
 main:
     mov n, %ecx
@@ -49,6 +50,10 @@ afisare:
     push $formatAfisare
     call printf
     add $8, %esp
+
+    push $0
+    call fflush
+    add $4, %esp
 
 et_exit:
     mov $1, %eax

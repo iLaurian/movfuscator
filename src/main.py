@@ -13,11 +13,11 @@ if __name__ == '__main__':
         print(f"Error: File '{input_filename}' not found.")
         sys.exit(1)
 
-    assembly_code = parse_asm_source(content)
+    assembly_code = parse_asm_for_alu(content)
 
     processed_alu_assembly = process_alu_parsed_lines(assembly_code)
 
-    assembly_code = parse_asm_source(processed_alu_assembly, "main:")
+    assembly_code = parse_asm_for_branching(processed_alu_assembly)
 
     final_assembly_lines = process_branching_parsed_lines(assembly_code)
 

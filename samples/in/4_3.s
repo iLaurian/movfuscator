@@ -40,12 +40,14 @@ et_cont_parcurgere:
     jmp et_parcurgere
 
 et_afisare:
-    mov max2, %edx
     push max2
     push $formatAf
     call printf
-    pop %ebx
-    pop %ebx
+    add $8, %esp
+
+    push $0
+    call fflush
+    add $4, %esp
 
 et_exit:
     mov $1, %eax

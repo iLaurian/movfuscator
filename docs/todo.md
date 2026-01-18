@@ -1,3 +1,13 @@
+# 2025-01-18
+
+- samples not working
+  - 2_10 @done
+    - wrote back to register file before updating flags, resulting in garbage in dest_reg
+  - 4_2 @done
+    - debug message printed in the console
+  - 4_4
+- fix exit code check in test.sh @done
+
 # 2025-01-11
 
 - sync `%esp` to `sp` for external functions to work @done

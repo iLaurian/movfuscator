@@ -1,6 +1,7 @@
 import sys
 import re
 
+
 def parse_args():
     """
     Parses sys.argv to find input filename and optional output filename (-o).
@@ -77,6 +78,7 @@ def process_data_section(lines):
 
     return processed_lines
 
+
 def parse_operand(operand):
     """
     Identifies the addressing mode and value of a single operand.
@@ -97,34 +99,22 @@ def parse_operand(operand):
     else:
         return 'mem', operand
 
-def parse_asm_source(lines, start_parsing_at=None):
+
+# Parser for ALU
+def parse_asm_for_alu(lines):
     """
     Parses ASM source file and returns a list of processed lines.
-    :param lines: list of lines to process representing the source assembly file and an instruction from which to start processing.
+    :param lines: list of lines to process representing the source assembly file.
     :return: a list of processed lines with the following format: [(assembler_directive, args), (label, [dtype, value]), ..., (opcode, [(addressing_mode, value)...])].
     """
     parsed_output = []
     current_section = None
 
-    parsing_active = (start_parsing_at is None)
-
     data_pattern = re.compile(r'^\s*([a-zA-Z_][a-zA-Z0-9_]*):\s*(\.[a-z]+)\s+(.*)')
     label_pattern = re.compile(r'^\s*([a-zA-Z_][a-zA-Z0-9_]*):\s*$')
 
-    start_trigger = None
-    if start_parsing_at:
-        start_trigger = re.compile(r'^\s*' + re.escape(start_parsing_at) + r':')
-
     for line in lines:
         clean_line = line.split('#')[0].strip()
-
-        if not parsing_active:
-            if clean_line and start_trigger and start_trigger.match(clean_line):
-                parsing_active = True
-
-            else:
-                parsed_output.append(line.rstrip('\n'))
-                continue
 
         if not clean_line:
             continue
@@ -195,3 +185,103 @@ def parse_asm_source(lines, start_parsing_at=None):
         parsed_output.append((opcode, parsed_operands))
 
     return parsed_output
+
+
+# Parser for branching
+def parse_asm_for_branching(lines: list[str]) -> list:
+    parsed_lines = []
+
+    instruction_pattern = re.compile(r'^(\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*(.*)')
+
+    jump_mnemonics = {
+        'jmp', 'je', 'jne', 'jz', 'jnz', 'jg', 'jge', 'jl', 'jle',
+        'ja', 'jae', 'jb', 'jbe', 'call', 'loop', 'loope', 'loopne'
+    }
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            parsed_lines.append(line)
+            continue
+
+        if stripped.startswith('#') or stripped.startswith(';'):
+            parsed_lines.append(line)
+            continue
+
+        code_part = line.split('#', 1)[0].rstrip()
+        stripped_code = code_part.strip()
+
+        if not stripped_code:
+            parsed_lines.append(line)
+            continue
+
+        if stripped_code.endswith(':'):
+            parsed_lines.append(line)
+            continue
+
+        if stripped_code.startswith('.'):
+            parsed_lines.append(line)
+            continue
+
+        match = instruction_pattern.match(code_part)
+        if match:
+            ws = match.group(1)
+            mnemonic = match.group(2)
+            raw_operands = match.group(3)
+
+            if raw_operands.lstrip().startswith(':'):
+                parsed_lines.append(line)
+                continue
+
+            full_mnemonic = ws + mnemonic
+            operands = []
+
+            if raw_operands.strip():
+                args = split_operands(raw_operands)
+
+                for arg in args:
+                    arg = arg.strip()
+                    if not arg: continue
+
+                    op_type = "mem"
+
+                    if arg.startswith('$'):
+                        op_type = "imm"
+                    elif arg.startswith('%'):
+                        op_type = "reg"
+                    else:
+
+                        clean_mnemonic = mnemonic.strip().lower()
+
+                        if (clean_mnemonic in jump_mnemonics or (
+                                clean_mnemonic.startswith('j') and len(clean_mnemonic) <= 4)) and '(' not in arg:
+                            op_type = "label"
+                        else:
+                            op_type = "mem"
+
+                    operands.append((op_type, arg))
+
+            parsed_lines.append((full_mnemonic, operands))
+        else:
+            parsed_lines.append(line)
+
+    return parsed_lines
+
+
+def split_operands(ops_str):
+    parts = []
+    current = []
+    paren_count = 0
+    for char in ops_str:
+        if char == '(':
+            paren_count += 1
+        elif char == ')':
+            paren_count -= 1
+
+        if char == ',' and paren_count == 0:
+            parts.append("".join(current))
+            current = []
+        else:
+            current.append(char)
+    parts.append("".join(current))
+    return parts

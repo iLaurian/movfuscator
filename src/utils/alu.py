@@ -220,7 +220,7 @@ def generate_alu_tables():
     emit("alu_pad_pre: .fill 16, 1, 0")
 
     scratch_vars = [
-        "alu_s0", "alu_s1", "alu_s2", "alu_s3", "alu_ss", "alu_sc", "alu_sx",
+        "alu_s0", "alu_s1", "alu_s2", "alu_s3", "alu_shl_pad", "alu_ss", "alu_sc", "alu_sx",
         "alu_z0", "alu_z1", "alu_z2", "alu_z3",
         "alu_n", "alu_d", "alu_q", "alu_r", "alu_t",
         "alu_ns", "alu_ds", "alu_qs", "alu_rs",
@@ -489,12 +489,12 @@ def translate_alu_instruction(opcode, operands):
         movb("%al", "cf")
 
     def prepare_shift(count_op, dest_op):
-        load_to_scratch(count_op, "alu_x")
-        load_to_scratch(dest_op, "alu_y")
+        load_to_scratch(dest_op, "alu_x")
+        load_to_scratch(count_op, "alu_y")
 
-        mov("alu_x", "%eax")
+        mov("alu_y", "%eax")
         mov("alu_clamp32(,%eax,4)", "%eax")
-        mov("%eax", "alu_x")
+        mov("%eax", "alu_y")
 
         mov("$0", "alu_s0")
         mov("$0", "alu_s1")
@@ -514,73 +514,73 @@ def translate_alu_instruction(opcode, operands):
         emit("# -- alu_shl --")
         prepare_shift(count_op, dest_op)
 
-        mov("alu_x", "%eax")
-        mov("alu_lshu8(,%eax,4)", "%edx")
+        mov("alu_y", "%edx")
+        mov("alu_lshu8(,%edx,4)", "%edx")
 
         mov("$0", "%eax")
-        movb("alu_y+0", "%al")
+        movb("alu_x+0", "%al")
         mov("(%edx,%eax,4)", "%ecx")
         mov("%ecx", "alu_s0")
 
         mov("$0", "%eax")
-        movb("alu_y+1", "%al")
+        movb("alu_x+1", "%al")
         mov("(%edx,%eax,4)", "%ecx")
-        mov("%ecx", "alu_s1")
+        mov("%ecx", "alu_s1+1")
 
         mov("$0", "%eax")
-        movb("alu_y+2", "%al")
+        movb("alu_x+2", "%al")
         mov("(%edx,%eax,4)", "%ecx")
-        mov("%ecx", "alu_s2")
+        mov("%ecx", "alu_s2+2")
 
         mov("$0", "%eax")
-        movb("alu_y+3", "%al")
+        movb("alu_x+3", "%al")
         mov("(%edx,%eax,4)", "%ecx")
-        mov("%ecx", "alu_s3")
+        mov("%ecx", "alu_s3+3")
 
         combine_scratch_to_s()
-        write_back("alu_s", dest_op)
         emit_update_zf_sf("alu_s")
+        write_back("alu_s", dest_op)
 
     def impl_alu_shr(count_op, dest_op):
         emit("# -- alu_shr --")
         prepare_shift(count_op, dest_op)
 
-        mov("alu_x", "%eax")
+        mov("alu_y", "%eax")
         mov("alu_rshu8(,%eax,4)", "%edx")
 
         mov("$0", "%eax")
-        movb("alu_y+0", "%al")
+        movb("alu_x+0", "%al")
         mov("(%edx,%eax,4)", "%ecx")
         mov("%ecx", "alu_s0-3")
 
         mov("$0", "%eax")
-        movb("alu_y+1", "%al")
+        movb("alu_x+1", "%al")
         mov("(%edx,%eax,4)", "%ecx")
         mov("%ecx", "alu_s1-2")
 
         mov("$0", "%eax")
-        movb("alu_y+2", "%al")
+        movb("alu_x+2", "%al")
         mov("(%edx,%eax,4)", "%ecx")
         mov("%ecx", "alu_s2-1")
 
         mov("$0", "%eax")
-        movb("alu_y+3", "%al")
+        movb("alu_x+3", "%al")
         mov("(%edx,%eax,4)", "%ecx")
         mov("%ecx", "alu_s3")
 
         combine_scratch_to_s()
-        write_back("alu_s", dest_op)
         emit_update_zf_sf("alu_s")
+        write_back("alu_s", dest_op)
 
     def impl_alu_sar(count_op, dest_op):
         emit("# -- alu_sar --")
         impl_alu_shr(count_op, dest_op)
 
-        mov("alu_x", "%eax")
+        mov("alu_y", "%eax")
         mov("alu_rshi8s(,%eax,4)", "%edx")
 
         mov("$0", "%eax")
-        movb("alu_y+3", "%al")
+        movb("alu_x+3", "%al")
         mov("(%edx,%eax,4)", "%ecx")
 
         mov("alu_s", "%eax")

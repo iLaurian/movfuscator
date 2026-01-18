@@ -117,9 +117,9 @@ class BranchingFuscator:
       .text
       # ############################## THE DISPATCHER ##############################
       {Labels.DISPATCHER_FUNCTION_NAME.value}:
-      push $__ARRIVED_AT_DISPATCHER_DEBUG_STR
-      call puts
-      add $4, %esp
+      # push $__ARRIVED_AT_DISPATCHER_DEBUG_STR
+      # call puts
+      # add $4, %esp
 
       # %eax now contains a pointer to a ucontext_t struct
       # which stores the values of all the registers at the moment
@@ -516,7 +516,7 @@ class BranchingFuscator:
 
   def translate_cmp(self, instruction: Instruction):
     self.emit(instruction.att_form())
-    self.copy_ALU_flags()
+    # self.copy_ALU_flags()
 
   def translate_flag_jmp(self, instruction: Instruction, flag_label: Labels, version = False):
     destination = BranchingFuscator.get_destination_string_for_jump(instruction)

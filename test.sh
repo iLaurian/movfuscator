@@ -8,6 +8,8 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
+TEMP_FILE=".temp_runner_output"
+
 echo -e "${BLUE}=======================================================${NC}"
 echo -e "${BLUE}          TRANSPILER VERIFICATION TEST RUNNER          ${NC}"
 echo -e "${BLUE}=======================================================${NC}"
@@ -28,7 +30,7 @@ for in_source in "$IN_DIR"/*.s; do
     out_source="$OUT_DIR/$filename"
 
     exe_in="./exe_ref_${filename%.s}"
-    exe_out="./exe_alu_${filename%.s}"
+    exe_out="./exe_transpiled_${filename%.s}"
 
     echo -e "\nProcessing: ${BLUE}$filename${NC}"
 
@@ -44,44 +46,46 @@ for in_source in "$IN_DIR"/*.s; do
         continue
     fi
 
-    compile_out_alu=$(gcc -m32 "$out_source" -o "$exe_out" -w -no-pie 2>&1)
+    compile_out_transpiled=$(gcc -m32 "$out_source" -o "$exe_out" -w -no-pie 2>&1)
     if [ $? -ne 0 ]; then
         echo -e "${RED}[COMPILE ERROR]${NC} Failed to compile transformed '$out_source'"
-        echo "$compile_out_alu"
+        echo "$compile_out_transpiled"
         rm -f "$exe_in"
         continue
     fi
 
-    output_ref=$("$exe_in" 2>&1 | tr -d '\0')
+    "$exe_in" > "$TEMP_FILE" 2>&1
     ret_ref=$?
+    output_ref=$(cat "$TEMP_FILE" | tr -d '\0')
 
-    output_alu=$("$exe_out" 2>&1 | tr -d '\0')
-    ret_alu=$?
+    "$exe_out" > "$TEMP_FILE" 2>&1
+    ret_transpiled=$?
+    output_transpiled=$(cat "$TEMP_FILE" | tr -d '\0')
 
     fail=0
 
-    if [ $ret_ref -ne $ret_alu ]; then
+    if [ $ret_ref -ne $ret_transpiled ]; then
         echo -e "  ${RED}FAIL: Exit Code Mismatch${NC}"
         echo "    INPUT SAMPLE: $ret_ref"
-        echo "    OUTPUT SAMPLE:  $ret_alu"
+        echo "    OUTPUT SAMPLE:  $ret_transpiled"
         fail=1
     fi
 
-    if [ "$output_ref" != "$output_alu" ]; then
+    if [ "$output_ref" != "$output_transpiled" ]; then
         echo -e "  ${RED}FAIL: Stdout/Stderr Mismatch${NC}"
         echo "    --- INPUT SAMPLE  ---"
         echo "$output_ref"
         echo "    --- OUTPUT SAMPLE ---"
-        echo "$output_alu"
+        echo "$output_transpiled"
         echo "    ---------------------"
         fail=1
     fi
 
     if [ $fail -eq 0 ]; then
-        echo -e "  ${GREEN}[PASS]${NC} Output: '$output_alu' | Exit Code: $ret_alu"
+        echo -e "  ${GREEN}[PASS]${NC} Output: '$output_transpiled' | Exit Code: $ret_transpiled"
     fi
 
-    rm -f "$exe_in" "$exe_out"
+    rm -f "$exe_in" "$exe_out" "$TEMP_FILE"
 
 done
 

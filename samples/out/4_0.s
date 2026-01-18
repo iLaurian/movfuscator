@@ -36,9 +36,9 @@
       .text
       # ############################## THE DISPATCHER ##############################
       MVF_DISPATCHER:
-      push $__ARRIVED_AT_DISPATCHER_DEBUG_STR
-      call puts
-      add $4, %esp
+      # push $__ARRIVED_AT_DISPATCHER_DEBUG_STR
+      # call puts
+      # add $4, %esp
 
       # %eax now contains a pointer to a ucontext_t struct
       # which stores the values of all the registers at the moment
@@ -134735,6 +134735,8 @@ alu_s1: .long 0
 alu_s2: .long 0
 .globl alu_s3
 alu_s3: .long 0
+.globl alu_shl_pad
+alu_shl_pad: .long 0
 .globl alu_ss
 alu_ss: .long 0
 .globl alu_sc
@@ -134827,46 +134829,46 @@ backup_edi: .long 0
 .global main
 main:
 	# -- context save --
-	movl %eax, backup_eax
-	movl %ebx, backup_ebx
-	movl %ecx, backup_ecx
-	movl %edx, backup_edx
-	movl %esi, backup_esi
-	movl %edi, backup_edi
+movl %eax, backup_eax
+movl %ebx, backup_ebx
+movl %ecx, backup_ecx
+movl %edx, backup_edx
+movl %esi, backup_esi
+movl %edi, backup_edi
 	# -- lea --
-	movl $0, alu_s
-	movl $v, alu_x
-	movl $0, %eax
-	movl $0, %ecx
-	movw alu_s+0, %ax
-	movw alu_x+0, %cx
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movw %dx, alu_s+0
-	movl %edx, alu_t
-	movl $0, %eax
-	movw alu_s+2, %ax
-	movl $0, %ecx
-	movw alu_x+2, %cx
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movl %edx, %eax
-	movl $0, %ecx
-	movb alu_t+2, %cl
-	movl alu_add16(,%eax,4), %edx
-	movl (%edx,%ecx,4), %edx
-	movw %dx, alu_s+2
-	movl %edx, alu_t
-	movl alu_s, %edi
+movl $0, alu_s
+movl $v, alu_x
+movl $0, %eax
+movl $0, %ecx
+movw alu_s+0, %ax
+movw alu_x+0, %cx
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movw %dx, alu_s+0
+movl %edx, alu_t
+movl $0, %eax
+movw alu_s+2, %ax
+movl $0, %ecx
+movw alu_x+2, %cx
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movl %edx, %eax
+movl $0, %ecx
+movb alu_t+2, %cl
+movl alu_add16(,%eax,4), %edx
+movl (%edx,%ecx,4), %edx
+movw %dx, alu_s+2
+movl %edx, alu_t
+movl alu_s, %edi
 	# -- context restore --
-	movl backup_eax, %eax
-	movl backup_ebx, %ebx
-	movl backup_ecx, %ecx
-	movl backup_edx, %edx
-	movl backup_esi, %esi
-	mov $1, %ecx
-	mov (%edi, %ecx, 4), %edx
+movl backup_eax, %eax
+movl backup_ebx, %ebx
+movl backup_ecx, %ecx
+movl backup_edx, %edx
+movl backup_esi, %esi
+mov $1, %ecx
+mov (%edi, %ecx, 4), %edx
 etexit:
-	mov $1, %eax
-	mov $0, %ebx
-	int $0x80
+mov $1, %eax
+mov $0, %ebx
+int $0x80
