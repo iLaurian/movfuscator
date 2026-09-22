@@ -6,7 +6,7 @@ def generate_alu_tables():
     """
     lines = []
 
-    # --- Constants ---
+    # Constants
     # Adjust these sizes based on your memory constraints
     SOFT_I_REGS = 4
     SOFT_F_REGS = 4
@@ -20,7 +20,6 @@ def generate_alu_tables():
     def build_1d_table(name, dtype, elements, expr_lambda):
         emit(f".align 16")
         emit(f".globl {name}")
-        # Generate values comma-separated
         vals = [hex(expr_lambda(x) & (0xFF if dtype == 'byte' else 0xFFFFFFFF)) for x in range(elements)]
         emit(f"{name}: .{dtype} " + ", ".join(vals))
         emit(f".equ {name}_END, .")
@@ -184,7 +183,7 @@ def generate_alu_tables():
 
     # Mapping: [SignA][SignB][SignResult]
     emit("alu_cmp_of_000: .long 0")  # Pos + Pos = Pos (OK)
-    emit("alu_cmp_of_001: .long 1")  # Pos + Pos = Neg (OVERFLOW) [FIXED]
+    emit("alu_cmp_of_001: .long 1")  # Pos + Pos = Neg (OVERFLOW)
     emit("alu_cmp_of_010: .long 0")  # Pos + Neg = Pos (OK)
     emit("alu_cmp_of_011: .long 0")  # Pos + Neg = Neg (OK)
     emit("alu_cmp_of_100: .long 0")  # Neg + Pos = Pos (OK)
